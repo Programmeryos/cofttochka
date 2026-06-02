@@ -21,8 +21,8 @@ export const Hero = () => {
             transition={{ duration: 0.6 }}
             className="text-5xl md:text-7xl font-serif font-bold leading-tight mb-6"
           >
-            В&apos;язані кофти, <br />
-            <span className="text-brand-primary italic">які обіймають</span>
+            В&apos;язаний одяг, <br />
+            <span className="text-brand-primary italic">який обіймає</span>
           </motion.h1>
           
           <motion.p 
@@ -53,7 +53,7 @@ export const Hero = () => {
       <div className="hidden lg:block absolute right-0 top-0 w-1/2 h-full">
         <Image
           src="https://images.unsplash.com/photo-1607557997149-96bf2b30c3c3?w=900&h=1200&fit=crop&q=85"
-          alt="Дівчина у в'язаній кофті — COFTOCHKA.UA"
+          alt="Дівчина у в'язаному одязі — COFTOCHKA.UA"
           fill
           priority
           className="object-cover object-top"

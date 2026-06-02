@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const Logo = () => (
+export const Logo = ({ light = false }: { light?: boolean }) => (
   <Link href="/" className="flex items-center gap-2 group">
     <div className="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-serif text-xl font-bold group-hover:scale-105 transition-transform">
       C
     </div>
-    <span className="font-serif text-xl font-bold tracking-tight text-brand-dark">
+    <span className={`font-serif text-xl font-bold tracking-tight ${light ? 'text-white' : 'text-brand-dark'}`}>
       COFTOCHKA<span className="text-brand-primary">.UA</span>
     </span>
   </Link>

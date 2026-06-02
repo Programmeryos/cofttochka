@@ -1,17 +1,44 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/sections/Footer';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
-import { ProductCard } from '@/components/sections/Catalog';
 import { useGetProductByIdQuery, useGetProductsQuery } from '@/lib/api';
+import type { Product } from '@/lib/api/types';
+
+const RelatedProductCard = ({ product }: { product: Product }) => {
+  const image = product.images[0]?.url;
+  return (
+    <Link href={`/product/${product.id}`} className="group block">
+      <div className="aspect-4/5 bg-brand-light rounded-2xl overflow-hidden relative mb-4">
+        {image ? (
+          <Image
+            src={image}
+            alt={product.name}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
+            sizes="(max-width: 640px) 50vw, 25vw"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-4xl">🧶</div>
+        )}
+      </div>
+      <h3 className="font-serif font-bold group-hover:text-brand-primary transition-colors truncate">
+        {product.name}
+      </h3>
+      <p className="font-bold mt-1">{Number(product.price).toLocaleString('uk-UA')} ₴</p>
+    </Link>
+  );
+};
 
 export const ProductPageClient = ({ id }: { id: string }) => {
+  const router = useRouter();
   const { data: product, isLoading, isError } = useGetProductByIdQuery(id);
   const { data: relatedData } = useGetProductsQuery(
     { categoryId: product?.categoryId ?? undefined, limit: 5 },
@@ -19,6 +46,10 @@ export const ProductPageClient = ({ id }: { id: string }) => {
   );
 
   const relatedProducts = relatedData?.data.filter(p => p.id !== id).slice(0, 4) ?? [];
+
+  useEffect(() => {
+    if (isError) router.replace('/not-found');
+  }, [isError, router]);
 
   if (isLoading) {
     return (
@@ -76,7 +107,7 @@ export const ProductPageClient = ({ id }: { id: string }) => {
               <h2 className="text-3xl font-serif font-bold mb-12">Вам також може сподобатись</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {relatedProducts.map(p => (
-                  <ProductCard key={p.id} product={p} />
+                  <RelatedProductCard key={p.id} product={p} />
                 ))}
               </div>
             </section>

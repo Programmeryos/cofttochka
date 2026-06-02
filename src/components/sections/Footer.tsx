@@ -9,9 +9,7 @@ export const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="col-span-1 md:col-span-1">
-            <div className="brightness-200 contrast-200">
-               <Logo />
-            </div>
+            <Logo light />
             <p className="mt-6 text-neutral-400 text-sm leading-relaxed">
               Ваш ідеальний затишок у кожній петельці. В&apos;язані вироби ручної роботи з доставкою по всій Україні.
             </p>
@@ -59,8 +57,8 @@ export const Footer = () => {
         <div className="pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
           <p>© 2025 COFTOCHKA.UA. Усі права захищені.</p>
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-white transition-colors">Політика конфіденційності</Link>
-            <Link href="#" className="hover:text-white transition-colors">Умови використання</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Політика конфіденційності</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Умови використання</Link>
           </div>
         </div>
       </div>

@@ -3,17 +3,16 @@
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, SlidersHorizontal, X, ShoppingBag } from 'lucide-react';
+import { Search, SlidersHorizontal, X, ShoppingBag, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { useGetProductsQuery, useGetCategoriesQuery } from '@/lib/api';
 import type { Product } from '@/lib/api/types';
 
-type SortOption = 'default' | 'newest' | 'price_asc' | 'price_desc';
+type SortOption = 'default' | 'price_asc' | 'price_desc';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'default', label: 'За замовчуванням' },
-  { value: 'newest', label: 'Новинки' },
   { value: 'price_asc', label: 'Ціна ↑' },
   { value: 'price_desc', label: 'Ціна ↓' },
 ];
@@ -148,7 +147,7 @@ export const Catalog = () => {
       : products;
 
     switch (sortBy) {
-      case 'newest':    return [...result].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
       case 'price_asc': return [...result].sort((a, b) => Number(a.price) - Number(b.price));
       case 'price_desc':return [...result].sort((a, b) => Number(b.price) - Number(a.price));
       default:          return result;
@@ -264,7 +263,7 @@ export const Catalog = () => {
                     }`}
                   >
                     <span className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${inStock ? 'bg-brand-primary border-brand-primary' : 'border-neutral-300'}`}>
-                      {inStock && <span className="text-white text-[10px] font-black">✓</span>}
+                      {inStock && <Check size={11} strokeWidth={3} className="text-white" />}
                     </span>
                     Тільки в наявності
                   </button>

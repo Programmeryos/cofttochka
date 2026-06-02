@@ -11,7 +11,7 @@ export default function Home() {
     "name": "COFTOCHKA.UA",
     "url": "https://coftochka.ua",
     "logo": "https://coftochka.ua/logo.png",
-    "description": "В'язані кофти ручної роботи з доставкою по Україні",
+    "description": "В'язаний одяг ручної роботи з доставкою по Україні",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "Київ",

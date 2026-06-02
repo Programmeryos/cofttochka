@@ -50,12 +50,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addItem = (product: Product) => {
     setItems(prev => {
-      const existing = prev.find(item => item.productId === product.id);
-      if (existing) {
-        return prev.map(item =>
-          item.productId === product.id ? { ...item, qty: item.qty + 1 } : item
-        );
-      }
+      if (prev.find(item => item.productId === product.id)) return prev;
       return [...prev, {
         productId: product.id,
         name: product.name,

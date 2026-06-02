@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Trash2, Plus, Minus, ArrowLeft, CheckCircle } from 'lucide-react';
+import { X, ShoppingBag, Trash2, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useCreateOrderMutation } from '@/lib/api';
 import Image from 'next/image';
@@ -17,13 +17,46 @@ interface OrderForm {
   comment: string;
 }
 
+interface FormErrors {
+  customerName?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+}
+
 const EMPTY_FORM: OrderForm = { customerName: '', customerPhone: '', customerEmail: '', comment: '' };
+
+const validate = (form: OrderForm): FormErrors => {
+  const e: FormErrors = {};
+
+  if (!form.customerName.trim()) {
+    e.customerName = "Введіть ваше ім'я";
+  } else if (form.customerName.trim().length < 2) {
+    e.customerName = "Мінімум 2 символи";
+  } else if (!/^[а-яА-ЯіІїЇєЄёЁa-zA-Z\s''-]+$/.test(form.customerName.trim())) {
+    e.customerName = "Лише літери та пробіли";
+  }
+
+  const phone = form.customerPhone.replace(/[\s\-()+]/g, '');
+  if (!form.customerPhone.trim()) {
+    e.customerPhone = 'Введіть номер телефону';
+  } else if (!/^(380|0)\d{9}$/.test(phone)) {
+    e.customerPhone = 'Формат: +380XXXXXXXXX або 0XXXXXXXXX';
+  }
+
+  if (form.customerEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.customerEmail.trim())) {
+    e.customerEmail = 'Введіть коректний email';
+  }
+
+  return e;
+};
 
 export const CartDrawer = () => {
   const { items, isOpen, closeCart, updateQty, removeItem, total, count } = useCart();
   const [step, setStep] = useState<Step>('cart');
   const [form, setForm] = useState<OrderForm>(EMPTY_FORM);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [formError, setFormError] = useState('');
+  const [touched, setTouched] = useState<Partial<Record<keyof FormErrors, boolean>>>({});
 
   const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
 
@@ -34,17 +67,21 @@ export const CartDrawer = () => {
 
   const handleClose = () => {
     closeCart();
-    setTimeout(() => { setStep('cart'); setForm(EMPTY_FORM); setFormError(''); }, 300);
+    setTimeout(() => { setStep('cart'); setForm(EMPTY_FORM); setErrors({}); setTouched({}); setFormError(''); }, 300);
+  };
+
+  const handleBlur = (key: keyof FormErrors) => {
+    setTouched(prev => ({ ...prev, [key]: true }));
+    setErrors(validate(form));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
-
-    if (!form.customerName.trim() || !form.customerPhone.trim()) {
-      setFormError("Будь ласка, заповніть ім'я та телефон");
-      return;
-    }
+    const errs = validate(form);
+    setErrors(errs);
+    setTouched({ customerName: true, customerPhone: true, customerEmail: true });
+    if (Object.keys(errs).length > 0) return;
 
     try {
       await createOrder({
@@ -58,22 +95,35 @@ export const CartDrawer = () => {
       items.forEach(item => removeItem(item.productId));
       setStep('success');
     } catch (err: unknown) {
-      const message = (err as { data?: { message?: string } })?.data?.message;
+      const data = (err as { data?: { message?: { message?: string } | string } })?.data;
+      const message = typeof data?.message === 'object'
+        ? data.message?.message
+        : data?.message;
       setFormError(message ?? 'Помилка при оформленні замовлення. Спробуйте ще раз.');
     }
   };
 
-  const field = (key: keyof OrderForm, label: string, extra?: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">{label}</label>
-      <input
-        value={form[key]}
-        onChange={e => setForm(prev => ({ ...prev, [key]: e.target.value }))}
-        className="w-full px-4 py-3 bg-neutral-50 rounded-2xl border border-transparent focus:border-brand-primary focus:bg-white outline-none transition-all text-sm"
-        {...extra}
-      />
-    </div>
-  );
+  const field = (key: keyof OrderForm, label: string, extra?: React.InputHTMLAttributes<HTMLInputElement>) => {
+    const err = touched[key as keyof FormErrors] ? errors[key as keyof FormErrors] : undefined;
+    return (
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">{label}</label>
+        <input
+          value={form[key]}
+          onChange={e => {
+            setForm(prev => ({ ...prev, [key]: e.target.value }));
+            if (touched[key as keyof FormErrors]) setErrors(validate({ ...form, [key]: e.target.value }));
+          }}
+          onBlur={() => handleBlur(key as keyof FormErrors)}
+          className={`w-full px-4 py-3 bg-neutral-50 rounded-2xl border focus:bg-white outline-none transition-all text-sm ${
+            err ? 'border-red-400 bg-red-50/30' : 'border-transparent focus:border-brand-primary'
+          }`}
+          {...extra}
+        />
+        {err && <p className="text-red-500 text-xs px-1">{err}</p>}
+      </div>
+    );
+  };
 
   return (
     <AnimatePresence>
@@ -120,9 +170,9 @@ export const CartDrawer = () => {
                       </div>
                       <h3 className="text-xl font-serif font-bold mb-2">Кошик порожній</h3>
                       <p className="text-neutral-400 text-sm italic mb-8">Додайте щось тепле</p>
-                      <button onClick={handleClose} className="w-full border-2 border-brand-primary text-brand-primary py-4 rounded-full font-bold hover:bg-brand-primary hover:text-white transition-all">
+                      <Link href="/#catalog" onClick={handleClose} className="w-full border-2 border-brand-primary text-brand-primary py-4 rounded-full font-bold hover:bg-brand-primary hover:text-white transition-all flex items-center justify-center">
                         Перейти до каталогу
-                      </button>
+                      </Link>
                     </div>
                   ) : (
                     <div className="space-y-6">
@@ -147,16 +197,8 @@ export const CartDrawer = () => {
                             </div>
                             {item.size && <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-auto">Розмір: {item.size}</p>}
                             <div className="flex items-center justify-between mt-4">
-                              <div className="flex items-center gap-1">
-                                <button onClick={() => updateQty(item.productId, -1)} className="w-8 h-8 rounded-lg border border-neutral-100 flex items-center justify-center hover:border-brand-primary transition-colors">
-                                  {item.qty === 1 ? <Trash2 size={14} /> : <Minus size={14} />}
-                                </button>
-                                <span className="w-8 text-center text-sm font-bold">{item.qty}</span>
-                                <button onClick={() => updateQty(item.productId, 1)} className="w-8 h-8 rounded-lg border border-neutral-100 flex items-center justify-center hover:border-brand-primary transition-colors">
-                                  <Plus size={14} />
-                                </button>
-                              </div>
-                              <span className="font-bold text-sm">{(item.price * item.qty).toLocaleString('uk-UA')} ₴</span>
+                              <div />
+                              <span className="font-bold text-sm">{item.price.toLocaleString('uk-UA')} ₴</span>
                             </div>
                           </div>
                         </div>
@@ -188,8 +230,8 @@ export const CartDrawer = () => {
             {step === 'checkout' && (
               <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 scrollbar-hide">
-                  {field('customerName', "Ім'я *", { placeholder: 'Іван Петренко', autoComplete: 'name' })}
-                  {field('customerPhone', 'Телефон *', { placeholder: '+380501234567', type: 'tel', autoComplete: 'tel' })}
+                  {field('customerName', "Ім'я *", { placeholder: 'Іван Петренко', autoComplete: 'name', required: true })}
+                  {field('customerPhone', 'Телефон *', { placeholder: '+380501234567', type: 'tel', autoComplete: 'tel', required: true })}
                   {field('customerEmail', 'Email', { placeholder: 'ivan@example.com', type: 'email', autoComplete: 'email' })}
 
                   <div className="flex flex-col gap-1.5">
