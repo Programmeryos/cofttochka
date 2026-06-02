@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 
 import { CartProvider } from "@/context/CartContext";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { StoreProvider } from "@/lib/StoreProvider";
 
 export default function RootLayout({
   children,
@@ -44,10 +45,12 @@ export default function RootLayout({
       className={`${playfair.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans text-neutral-800 bg-white">
-        <CartProvider>
-          {children}
-          <CartDrawer />
-        </CartProvider>
+        <StoreProvider>
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
+        </StoreProvider>
       </body>
     </html>
   );

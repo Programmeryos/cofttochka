@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Heart, ShieldCheck, MapPin } from 'lucide-react';
 
 export const AboutUs = () => {
@@ -7,8 +8,13 @@ export const AboutUs = () => {
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="order-2 lg:order-1">
-            <div className="aspect-square bg-neutral-200 rounded-3xl overflow-hidden animate-pulse flex items-center justify-center">
-                <span className="text-neutral-400 font-serif italic text-2xl">Production Process</span>
+            <div className="aspect-square rounded-3xl overflow-hidden relative">
+              <Image
+                src="https://images.unsplash.com/photo-1632649027900-389e810204e6?w=800&h=800&fit=crop&q=85"
+                alt="Майстриня за в'язанням — ручна робота COFTOCHKA.UA"
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
           

@@ -1,15 +1,13 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { Product, ProductColor, ProductSize } from '@/data/products';
+import type { Product, ProductSize } from '@/lib/api/types';
 
 export interface CartItem {
-  productId: number;
-  slug: string;
+  productId: string;
   name: string;
-  image: string;
-  color: ProductColor;
-  size: ProductSize;
+  image: string | null;
+  size: ProductSize | null;
   price: number;
   qty: number;
 }
@@ -19,9 +17,9 @@ interface CartContextType {
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
-  addItem: (product: Product, color: ProductColor, size: ProductSize) => void;
-  removeItem: (productId: number, size: string, colorName: string) => void;
-  updateQty: (productId: number, size: string, colorName: string, delta: number) => void;
+  addItem: (product: Product) => void;
+  removeItem: (productId: string) => void;
+  updateQty: (productId: string, delta: number) => void;
   total: number;
   count: number;
 }
@@ -33,20 +31,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('coftochka_cart');
     if (saved) {
-      try {
-        setItems(JSON.parse(saved));
-      } catch (e) {
-        console.error('Failed to parse cart', e);
-      }
+      try { setItems(JSON.parse(saved)); } catch { /* ignore */ }
     }
     setIsInitialized(true);
   }, []);
 
-  // Save to localStorage
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem('coftochka_cart', JSON.stringify(items));
@@ -56,65 +48,46 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
 
-  const addItem = (product: Product, color: ProductColor, size: ProductSize) => {
+  const addItem = (product: Product) => {
     setItems(prev => {
-      const existing = prev.find(
-        item => item.productId === product.id && item.size === size && item.color.name === color.name
-      );
-
+      const existing = prev.find(item => item.productId === product.id);
       if (existing) {
         return prev.map(item =>
-          item === existing ? { ...item, qty: item.qty + 1 } : item
+          item.productId === product.id ? { ...item, qty: item.qty + 1 } : item
         );
       }
-
-      const newItem: CartItem = {
+      return [...prev, {
         productId: product.id,
-        slug: product.slug,
         name: product.name,
-        image: product.image,
-        color,
-        size,
-        price: product.price,
+        image: product.images[0]?.url ?? null,
+        size: product.size,
+        price: Number(product.price),
         qty: 1,
-      };
-
-      return [...prev, newItem];
+      }];
     });
     openCart();
   };
 
-  const removeItem = (productId: number, size: string, colorName: string) => {
-    setItems(prev => prev.filter(
-      item => !(item.productId === productId && item.size === size && item.color.name === colorName)
-    ));
+  const removeItem = (productId: string) => {
+    setItems(prev => prev.filter(item => item.productId !== productId));
   };
 
-  const updateQty = (productId: number, size: string, colorName: string, delta: number) => {
-    setItems(prev => prev.map(item => {
-      if (item.productId === productId && item.size === size && item.color.name === colorName) {
-        const newQty = Math.max(1, item.qty + delta);
-        return { ...item, qty: newQty };
-      }
-      return item;
-    }));
+  const updateQty = (productId: string, delta: number) => {
+    setItems(prev => {
+      const updated = prev.map(item => {
+        if (item.productId !== productId) return item;
+        const newQty = item.qty + delta;
+        return newQty <= 0 ? null : { ...item, qty: newQty };
+      }).filter(Boolean) as CartItem[];
+      return updated;
+    });
   };
 
   const total = useMemo(() => items.reduce((sum, item) => sum + item.price * item.qty, 0), [items]);
   const count = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
 
   return (
-    <CartContext.Provider value={{
-      items,
-      isOpen,
-      openCart,
-      closeCart,
-      addItem,
-      removeItem,
-      updateQty,
-      total,
-      count
-    }}>
+    <CartContext.Provider value={{ items, isOpen, openCart, closeCart, addItem, removeItem, updateQty, total, count }}>
       {children}
     </CartContext.Provider>
   );

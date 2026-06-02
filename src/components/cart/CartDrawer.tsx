@@ -1,156 +1,252 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
+import { X, ShoppingBag, Trash2, Plus, Minus, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useCreateOrderMutation } from '@/lib/api';
 import Image from 'next/image';
 import Link from 'next/link';
 
+type Step = 'cart' | 'checkout' | 'success';
+
+interface OrderForm {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  comment: string;
+}
+
+const EMPTY_FORM: OrderForm = { customerName: '', customerPhone: '', customerEmail: '', comment: '' };
+
 export const CartDrawer = () => {
   const { items, isOpen, closeCart, updateQty, removeItem, total, count } = useCart();
+  const [step, setStep] = useState<Step>('cart');
+  const [form, setForm] = useState<OrderForm>(EMPTY_FORM);
+  const [formError, setFormError] = useState('');
 
-  // Scroll lock
+  const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
+
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
+
+  const handleClose = () => {
+    closeCart();
+    setTimeout(() => { setStep('cart'); setForm(EMPTY_FORM); setFormError(''); }, 300);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!form.customerName.trim() || !form.customerPhone.trim()) {
+      setFormError("Будь ласка, заповніть ім'я та телефон");
+      return;
+    }
+
+    try {
+      await createOrder({
+        customerName: form.customerName.trim(),
+        customerPhone: form.customerPhone.trim(),
+        customerEmail: form.customerEmail.trim() || undefined,
+        comment: form.comment.trim() || undefined,
+        items: items.map(item => ({ productId: item.productId, quantity: item.qty })),
+      }).unwrap();
+
+      items.forEach(item => removeItem(item.productId));
+      setStep('success');
+    } catch (err: unknown) {
+      const message = (err as { data?: { message?: string } })?.data?.message;
+      setFormError(message ?? 'Помилка при оформленні замовлення. Спробуйте ще раз.');
+    }
+  };
+
+  const field = (key: keyof OrderForm, label: string, extra?: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">{label}</label>
+      <input
+        value={form[key]}
+        onChange={e => setForm(prev => ({ ...prev, [key]: e.target.value }))}
+        className="w-full px-4 py-3 bg-neutral-50 rounded-2xl border border-transparent focus:border-brand-primary focus:bg-white outline-none transition-all text-sm"
+        {...extra}
+      />
+    </div>
+  );
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={closeCart}
-            className="fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={handleClose}
+            className="fixed inset-0 bg-black/40 z-60 backdrop-blur-sm"
           />
 
-          {/* Drawer */}
           <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 h-full w-full max-w-[420px] bg-white z-[70] shadow-2xl flex flex-col"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Кошик"
+            className="fixed right-0 top-0 h-full w-full max-w-105 bg-white z-70 shadow-2xl flex flex-col"
+            role="dialog" aria-modal="true" aria-label="Кошик"
           >
             {/* Header */}
             <div className="px-6 h-20 flex items-center justify-between border-b border-neutral-100 shrink-0">
               <div className="flex items-center gap-3">
-                 <h2 className="text-xl font-serif font-bold">Кошик</h2>
-                 <span className="text-sm text-neutral-400 font-medium">({count})</span>
+                {step === 'checkout' && (
+                  <button onClick={() => setStep('cart')} className="mr-1 text-neutral-400 hover:text-brand-dark transition-colors">
+                    <ArrowLeft size={20} />
+                  </button>
+                )}
+                <h2 className="text-xl font-serif font-bold">
+                  {step === 'cart' ? 'Кошик' : step === 'checkout' ? 'Оформлення' : 'Дякуємо!'}
+                </h2>
+                {step === 'cart' && <span className="text-sm text-neutral-400 font-medium">({count})</span>}
               </div>
-              <button 
-                onClick={closeCart}
-                className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-neutral-100 transition-colors"
-              >
+              <button onClick={handleClose} className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-neutral-100 transition-colors">
                 <X size={20} />
               </button>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide">
-              {items.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center">
-                  <div className="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center text-brand-primary mb-6">
-                    <ShoppingBag size={32} strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-xl font-serif font-bold mb-2">Кошик порожній</h3>
-                  <p className="text-neutral-400 text-sm italic mb-8">Додайте щось тепле 🤍</p>
-                  <button 
-                    onClick={closeCart}
-                    className="w-full border-2 border-brand-primary text-brand-primary py-4 rounded-full font-bold hover:bg-brand-primary hover:text-white transition-all"
-                  >
-                    Перейти до каталогу
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {items.map((item) => (
-                    <div key={`${item.productId}-${item.size}-${item.color.name}`} className="flex gap-4 group">
-                      <Link href={`/product/${item.slug}`} onClick={closeCart} className="shrink-0">
-                        <div className="w-24 h-32 bg-brand-light relative rounded-xl overflow-hidden">
-                          <Image src={item.image} alt={item.name} fill className="object-cover" />
-                        </div>
-                      </Link>
-                      
-                      <div className="flex-1 flex flex-col py-1">
-                        <div className="flex justify-between items-start mb-1">
-                          <Link href={`/product/${item.slug}`} onClick={closeCart}>
-                            <h4 className="font-serif font-bold text-sm hover:text-brand-primary transition-colors">{item.name}</h4>
-                          </Link>
-                          <button 
-                            onClick={() => removeItem(item.productId, item.size, item.color.name)}
-                            className="text-neutral-300 hover:text-red-400 transition-colors"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                        
-                        <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-auto">
-                          {item.color.name} · {item.size}
-                        </p>
-
-                        <div className="flex items-center justify-between mt-4">
-                          <div className="flex items-center gap-1">
-                            <button 
-                              onClick={() => updateQty(item.productId, item.size, item.color.name, -1)}
-                              className="w-8 h-8 rounded-lg border border-neutral-100 flex items-center justify-center hover:border-brand-primary transition-colors disabled:opacity-30"
-                            >
-                              {item.qty === 1 ? <Trash2 size={14} /> : <Minus size={14} />}
-                            </button>
-                            <span className="w-8 text-center text-sm font-bold">{item.qty}</span>
-                            <button 
-                              onClick={() => updateQty(item.productId, item.size, item.color.name, 1)}
-                              className="w-8 h-8 rounded-lg border border-neutral-100 flex items-center justify-center hover:border-brand-primary transition-colors"
-                            >
-                              <Plus size={14} />
-                            </button>
-                          </div>
-                          <span className="font-bold text-sm">{(item.price * item.qty).toLocaleString('uk-UA')} ₴</span>
-                        </div>
+            {/* ── CART STEP ── */}
+            {step === 'cart' && (
+              <>
+                <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-hide">
+                  {items.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center">
+                      <div className="w-20 h-20 bg-brand-light rounded-full flex items-center justify-center text-brand-primary mb-6">
+                        <ShoppingBag size={32} strokeWidth={1.5} />
                       </div>
+                      <h3 className="text-xl font-serif font-bold mb-2">Кошик порожній</h3>
+                      <p className="text-neutral-400 text-sm italic mb-8">Додайте щось тепле</p>
+                      <button onClick={handleClose} className="w-full border-2 border-brand-primary text-brand-primary py-4 rounded-full font-bold hover:bg-brand-primary hover:text-white transition-all">
+                        Перейти до каталогу
+                      </button>
                     </div>
-                  ))}
+                  ) : (
+                    <div className="space-y-6">
+                      {items.map(item => (
+                        <div key={item.productId} className="flex gap-4 group">
+                          <Link href={`/product/${item.productId}`} onClick={handleClose} className="shrink-0">
+                            <div className="w-24 h-32 bg-brand-light relative rounded-xl overflow-hidden">
+                              {item.image
+                                ? <Image src={item.image} alt={item.name} fill className="object-cover" />
+                                : <div className="w-full h-full flex items-center justify-center text-neutral-300"><ShoppingBag size={24} /></div>
+                              }
+                            </div>
+                          </Link>
+                          <div className="flex-1 flex flex-col py-1">
+                            <div className="flex justify-between items-start mb-1">
+                              <Link href={`/product/${item.productId}`} onClick={handleClose}>
+                                <h4 className="font-serif font-bold text-sm hover:text-brand-primary transition-colors">{item.name}</h4>
+                              </Link>
+                              <button onClick={() => removeItem(item.productId)} className="text-neutral-300 hover:text-red-400 transition-colors">
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                            {item.size && <p className="text-[10px] text-neutral-400 uppercase tracking-widest mb-auto">Розмір: {item.size}</p>}
+                            <div className="flex items-center justify-between mt-4">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => updateQty(item.productId, -1)} className="w-8 h-8 rounded-lg border border-neutral-100 flex items-center justify-center hover:border-brand-primary transition-colors">
+                                  {item.qty === 1 ? <Trash2 size={14} /> : <Minus size={14} />}
+                                </button>
+                                <span className="w-8 text-center text-sm font-bold">{item.qty}</span>
+                                <button onClick={() => updateQty(item.productId, 1)} className="w-8 h-8 rounded-lg border border-neutral-100 flex items-center justify-center hover:border-brand-primary transition-colors">
+                                  <Plus size={14} />
+                                </button>
+                              </div>
+                              <span className="font-bold text-sm">{(item.price * item.qty).toLocaleString('uk-UA')} ₴</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
-            {/* Footer */}
-            {items.length > 0 && (
-              <div className="p-6 border-t border-neutral-100 bg-neutral-50/50 shrink-0">
-                <div className="space-y-2 mb-6">
-                  <div className="flex justify-between items-center text-neutral-500 text-sm">
-                    <span>Доставка</span>
-                    <span>розраховується</span>
+                {items.length > 0 && (
+                  <div className="p-6 border-t border-neutral-100 bg-neutral-50/50 shrink-0">
+                    <div className="flex justify-between items-center mb-6">
+                      <span className="font-bold text-lg">Разом:</span>
+                      <span className="font-bold text-2xl text-brand-dark">{total.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                    <div className="space-y-3">
+                      <button onClick={() => setStep('checkout')} className="w-full bg-brand-primary text-white py-5 rounded-full font-bold text-lg hover:bg-brand-secondary transition-all hover:shadow-xl active:scale-[0.98]">
+                        Оформити замовлення
+                      </button>
+                      <button onClick={handleClose} className="w-full py-2 text-sm text-neutral-400 font-medium hover:text-brand-dark transition-colors">
+                        Продовжити покупки
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="font-bold text-lg">Разом:</span>
-                    <span className="font-bold text-2xl text-brand-dark">{total.toLocaleString('uk-UA')} ₴</span>
+                )}
+              </>
+            )}
+
+            {/* ── CHECKOUT STEP ── */}
+            {step === 'checkout' && (
+              <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 scrollbar-hide">
+                  {field('customerName', "Ім'я *", { placeholder: 'Іван Петренко', autoComplete: 'name' })}
+                  {field('customerPhone', 'Телефон *', { placeholder: '+380501234567', type: 'tel', autoComplete: 'tel' })}
+                  {field('customerEmail', 'Email', { placeholder: 'ivan@example.com', type: 'email', autoComplete: 'email' })}
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-widest text-neutral-400">Коментар</label>
+                    <textarea
+                      value={form.comment}
+                      onChange={e => setForm(prev => ({ ...prev, comment: e.target.value }))}
+                      rows={3}
+                      placeholder="Побажання до замовлення..."
+                      className="w-full px-4 py-3 bg-neutral-50 rounded-2xl border border-transparent focus:border-brand-primary focus:bg-white outline-none transition-all text-sm resize-none"
+                    />
                   </div>
+
+                  <div className="pt-2 border-t border-neutral-100">
+                    <p className="text-xs text-neutral-400 mb-3">Ваше замовлення ({items.length} поз.)</p>
+                    {items.map(item => (
+                      <div key={item.productId} className="flex justify-between text-sm py-1">
+                        <span className="text-neutral-600 truncate mr-4">{item.name} × {item.qty}</span>
+                        <span className="font-medium shrink-0">{(item.price * item.qty).toLocaleString('uk-UA')} ₴</span>
+                      </div>
+                    ))}
+                    <div className="flex justify-between font-bold text-base pt-3 mt-2 border-t border-neutral-100">
+                      <span>Разом</span>
+                      <span>{total.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {formError && (
+                    <p className="text-red-500 text-sm bg-red-50 px-4 py-3 rounded-xl">{formError}</p>
+                  )}
                 </div>
-                
-                <div className="space-y-3">
-                  <button className="w-full bg-brand-primary text-white py-5 rounded-full font-bold text-lg hover:bg-brand-secondary transition-all hover:shadow-xl active:scale-[0.98]">
-                    Оформити замовлення
-                  </button>
-                  <button 
-                    onClick={closeCart}
-                    className="w-full py-2 text-sm text-neutral-400 font-medium hover:text-brand-dark transition-colors"
+
+                <div className="p-6 border-t border-neutral-100 bg-neutral-50/50 shrink-0">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-brand-primary text-white py-5 rounded-full font-bold text-lg hover:bg-brand-secondary transition-all hover:shadow-xl active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Продовжити покупки
+                    {isSubmitting ? 'Відправляємо...' : 'Підтвердити замовлення'}
                   </button>
                 </div>
+              </form>
+            )}
+
+            {/* ── SUCCESS STEP ── */}
+            {step === 'success' && (
+              <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-6">
+                  <CheckCircle size={40} strokeWidth={1.5} />
+                </div>
+                <h3 className="text-2xl font-serif font-bold mb-3">Замовлення прийнято!</h3>
+                <p className="text-neutral-500 text-sm leading-relaxed mb-10">
+                  Дякуємо за покупку. Ми зв'яжемось з вами найближчим часом для підтвердження.
+                </p>
+                <button onClick={handleClose} className="w-full bg-brand-primary text-white py-4 rounded-full font-bold hover:bg-brand-secondary transition-all">
+                  Закрити
+                </button>
               </div>
             )}
           </motion.div>
