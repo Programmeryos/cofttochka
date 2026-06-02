@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { CartProvider } from "@/context/CartContext";
+import { CartDrawer } from "@/components/cart/CartDrawer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -41,7 +44,10 @@ export default function RootLayout({
       className={`${playfair.variable} ${montserrat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans text-neutral-800 bg-white">
-        {children}
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

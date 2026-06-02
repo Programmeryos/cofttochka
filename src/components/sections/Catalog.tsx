@@ -2,9 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Search, SlidersHorizontal, X, ShoppingBag } from 'lucide-react';
 import { PRODUCTS, Product, ALL_COLORS } from '@/data/products';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '@/context/CartContext';
 
 type SortOption = 'default' | 'newest' | 'price_asc' | 'price_desc' | 'popular';
 
@@ -73,68 +75,85 @@ const PriceRangeSlider = ({
   );
 };
 
-const ProductCard = ({ product }: { product: Product }) => (
-  <motion.article
-    layout
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.95 }}
-    transition={{ duration: 0.3 }}
-    className="group relative"
-  >
-    <div className="aspect-4/5 bg-brand-light relative overflow-hidden rounded-2xl">
-      <Image
-        src={product.image}
-        alt={`${product.name} — в'язана кофта ${product.colors.map(c => c.name).join(', ')}`}
-        fill
-        className="object-cover group-hover:scale-105 transition-transform duration-700"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-      />
+export const ProductCard = ({ product }: { product: Product }) => {
+  const { addItem } = useCart();
 
-      {(product.isNew || product.isHit) && (
-        <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-          {product.isNew && (
-            <span className="bg-brand-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
-              Новинка
-            </span>
-          )}
-          {product.isHit && (
-            <span className="bg-brand-secondary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
-              Хіт
-            </span>
-          )}
-        </div>
-      )}
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem(product, product.colors[0], product.sizes[0]);
+  };
 
-      <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 z-10">
-        <button className="w-full bg-white text-brand-dark py-3 rounded-xl font-medium shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center gap-2 active:scale-95">
-          <ShoppingBag size={18} />
-          До кошика
-        </button>
-      </div>
-    </div>
-
-    <div className="mt-4 px-1">
-      <h3 className="font-serif text-lg font-bold group-hover:text-brand-primary transition-colors">
-        {product.name}
-      </h3>
-      <div className="flex items-center gap-2 mt-1.5">
-        {product.colors.map((color, i) => (
-          <div
-            key={i}
-            className="w-3 h-3 rounded-full border border-neutral-200"
-            style={{ backgroundColor: color.hex }}
-            title={color.name}
+  return (
+    <motion.article
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
+      className="group relative"
+    >
+      <div className="aspect-4/5 bg-brand-light relative overflow-hidden rounded-2xl">
+        <Link href={`/product/${product.slug}`} className="block w-full h-full">
+          <Image
+            src={product.image}
+            alt={`${product.name} — в'язана кофта ${product.colors.map(c => c.name).join(', ')}`}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
-        ))}
-        <span className="text-xs text-neutral-400 ml-auto">
-          {product.sizes.join(' · ')}
-        </span>
+        </Link>
+
+        {(product.isNew || product.isHit) && (
+          <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+            {product.isNew && (
+              <span className="bg-brand-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Новинка
+              </span>
+            )}
+            {product.isHit && (
+              <span className="bg-brand-secondary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
+                Хіт
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 z-10 pointer-events-none">
+          <button 
+            onClick={handleAddToCart}
+            className="w-full bg-white text-brand-dark py-3 rounded-xl font-medium shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center gap-2 active:scale-95 pointer-events-auto"
+          >
+            <ShoppingBag size={18} />
+            До кошика
+          </button>
+        </div>
       </div>
-      <p className="mt-2 font-bold text-lg">{product.price.toLocaleString('uk-UA')} ₴</p>
-    </div>
-  </motion.article>
-);
+
+      <div className="mt-4 px-1">
+        <Link href={`/product/${product.slug}`}>
+          <h3 className="font-serif text-lg font-bold group-hover:text-brand-primary transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+        <div className="flex items-center gap-2 mt-1.5">
+          {product.colors.map((color, i) => (
+            <div
+              key={i}
+              className="w-3 h-3 rounded-full border border-neutral-200"
+              style={{ backgroundColor: color.hex }}
+              title={color.name}
+            />
+          ))}
+          <span className="text-xs text-neutral-400 ml-auto">
+            {product.sizes.join(' · ')}
+          </span>
+        </div>
+        <p className="mt-2 font-bold text-lg">{product.price.toLocaleString('uk-UA')} ₴</p>
+      </div>
+    </motion.article>
+  );
+};
 
 export const Catalog = () => {
   const [search, setSearch] = useState('');
