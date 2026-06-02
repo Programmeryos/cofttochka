@@ -11,7 +11,7 @@ export const AboutUs = () => {
             <div className="aspect-square rounded-3xl overflow-hidden relative">
               <Image
                 src="https://images.unsplash.com/photo-1632649027900-389e810204e6?w=800&h=800&fit=crop&q=85"
-                alt="Майстриня за в'язанням — ручна робота COFTOCHKA.UA"
+                alt="Майстриня за в'язанням — ручна робота COFTOCHKA.COM"
                 fill
                 className="object-cover"
               />
@@ -21,7 +21,7 @@ export const AboutUs = () => {
           <div className="order-1 lg:order-2">
             <h2 className="text-4xl font-serif font-bold mb-8">Зроблено з любов&apos;ю до кожної деталі</h2>
             <p className="text-lg text-neutral-600 mb-12 leading-relaxed">
-              COFTOCHKA.UA — це не просто бренд одягу, це філософія затишку. Кожен наш виріб створюється вручну майстрами, які вкладають частку своєї душі у кожну петельку. Ми використовуємо тільки високоякісну натуральну пряжу, щоб ви відчували тепло та ніжність кожного дня.
+              COFTOCHKA.COM — це не просто бренд одягу, це філософія затишку. Кожен наш виріб створюється вручну майстрами, які вкладають частку своєї душі у кожну петельку. Ми використовуємо тільки високоякісну натуральну пряжу, щоб ви відчували тепло та ніжність кожного дня.
             </p>
 
             <div className="grid gap-6">

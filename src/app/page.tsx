@@ -8,9 +8,9 @@ export default function Home() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "COFTOCHKA.UA",
-    "url": "https://coftochka.ua",
-    "logo": "https://coftochka.ua/logo.png",
+    "name": "COFTOCHKA.COM",
+    "url": "https://www.coftochka.com",
+    "logo": "https://www.coftochka.com/logo.png",
     "description": "В'язаний одяг ручної роботи з доставкою по Україні",
     "address": {
       "@type": "PostalAddress",

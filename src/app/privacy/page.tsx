@@ -4,10 +4,10 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/sections/Footer';
 
 export const metadata: Metadata = {
-  title: 'Політика конфіденційності | COFTOCHKA.UA',
-  description: 'Дізнайтесь як COFTOCHKA.UA збирає, зберігає та захищає ваші персональні дані відповідно до законодавства України.',
+  title: 'Політика конфіденційності | COFTOCHKA.COM',
+  description: 'Дізнайтесь як COFTOCHKA.COM збирає, зберігає та захищає ваші персональні дані відповідно до законодавства України.',
   alternates: {
-    canonical: 'https://coftochka.ua/privacy',
+    canonical: 'https://www.coftochka.com/privacy',
   },
 };
 
@@ -25,7 +25,7 @@ export default function PrivacyPage() {
               <section>
                 <h2 className="text-2xl font-serif font-bold mb-4">1. Загальні положення</h2>
                 <div className="space-y-4 text-neutral-700 leading-relaxed">
-                  <p>1.1. Ця Політика конфіденційності (далі — «Політика») регулює порядок збору, зберігання, обробки та захисту персональних даних користувачів (далі — «Користувач», «Ви») інтернет-магазину <strong>COFTOCHKA.UA</strong>, розміщеного за адресою: <strong>https://coftochka.ua</strong> (далі — «Сайт», «Магазин»).</p>
+                  <p>1.1. Ця Політика конфіденційності (далі — «Політика») регулює порядок збору, зберігання, обробки та захисту персональних даних користувачів (далі — «Користувач», «Ви») інтернет-магазину <strong>COFTOCHKA.COM</strong>, розміщеного за адресою: <strong>https://www.coftochka.com</strong> (далі — «Сайт», «Магазин»).</p>
                   <p>1.2. Ця Політика розроблена відповідно до вимог Закону України «Про захист персональних даних» від 01.06.2010 № 2297-VI, Закону України «Про інформацію», а також застосовних норм Загального регламенту про захист даних ЄС (GDPR) у частині, що стосується обробки даних громадян держав-членів ЄС.</p>
                   <p>1.3. Використовуючи Сайт, здійснюючи замовлення або реєструючись, Ви підтверджуєте, що ознайомились із цією Політикою та надаєте добровільну, конкретну, поінформовану та однозначну згоду на обробку Ваших персональних даних у порядку та на умовах, визначених цією Політикою.</p>
                   <p>1.4. Якщо Ви не погоджуєтесь із умовами цієї Політики, будь ласка, утримайтесь від використання Сайту та передачі нам будь-яких персональних даних.</p>
@@ -35,11 +35,11 @@ export default function PrivacyPage() {
               <section>
                 <h2 className="text-2xl font-serif font-bold mb-4">2. Ідентифікація оператора персональних даних</h2>
                 <div className="space-y-4 text-neutral-700 leading-relaxed">
-                  <p>2.1. Оператором персональних даних є фізична особа — підприємець, що здійснює діяльність під торговою маркою <strong>COFTOCHKA.UA</strong> (далі — «Оператор», «Ми»).</p>
+                  <p>2.1. Оператором персональних даних є фізична особа — підприємець, що здійснює діяльність під торговою маркою <strong>COFTOCHKA.COM</strong> (далі — «Оператор», «Ми»).</p>
                   <p>2.2. Контактні дані Оператора:</p>
                   <ul className="list-disc pl-6 space-y-2">
-                    <li><strong>Електронна пошта:</strong> <a href="mailto:hello@coftochka.ua" className="text-brand-primary hover:underline">hello@coftochka.ua</a></li>
-                    <li><strong>Телефон:</strong> +38 (099) 000-00-00</li>
+                    <li><strong>Електронна пошта:</strong> <a href="mailto:romandricik@gmail.com" className="text-brand-primary hover:underline">romandricik@gmail.com</a></li>
+                    <li><strong>Телефон:</strong> +38 0688521018</li>
                     <li><strong>Адреса:</strong> м. Київ, Україна</li>
                   </ul>
                   <p>2.3. З усіх питань, пов&apos;язаних із обробкою персональних даних, захистом Ваших прав або відкликанням згоди, Ви можете звернутися до Оператора за зазначеними вище контактними даними.</p>
@@ -158,7 +158,7 @@ export default function PrivacyPage() {
                 <h2 className="text-2xl font-serif font-bold mb-4">8. Права суб&apos;єктів персональних даних</h2>
                 <div className="space-y-4 text-neutral-700 leading-relaxed">
                   <p>Відповідно до законодавства, Ви маєте права на: доступ, виправлення, видалення («право бути забутим»), обмеження обробки, заперечення, портативність даних та відкликання згоди.</p>
-                  <p>Для реалізації прав надішліть запит на <a href="mailto:hello@coftochka.ua" className="text-brand-primary hover:underline">hello@coftochka.ua</a>. Строк розгляду — до 30 днів.</p>
+                  <p>Для реалізації прав надішліть запит на <a href="mailto:romandricik@gmail.com" className="text-brand-primary hover:underline">romandricik@gmail.com</a>. Строк розгляду — до 30 днів.</p>
                 </div>
               </section>
 

@@ -13,20 +13,20 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "COFTOCHKA.UA — В'язаний одяг ручної роботи з доставкою по Україні",
-  description: "Відкрийте для себе затишок з COFTOCHKA.UA. В'язаний одяг ручної роботи, який обіймає. Светри, кардигани, оверсайз. Якість, стиль та handmade з любов'ю в Україні.",
+  title: "COFTOCHKA.COM — В'язаний одяг ручної роботи з доставкою по Україні",
+  description: "Відкрийте для себе затишок з COFTOCHKA.COM. В'язаний одяг ручної роботи, який обіймає. Светри, кардигани, оверсайз. Якість, стиль та handmade з любов'ю в Україні.",
   keywords: ["в'язаний одяг", "в'язані светри", "в'язані кардигани", "купити в'язаний одяг", "handmade", "Україна", "ручна робота"],
-  authors: [{ name: "COFTOCHKA.UA" }],
+  authors: [{ name: "COFTOCHKA.COM" }],
   openGraph: {
-    title: "COFTOCHKA.UA — В'язаний одяг ручної роботи",
+    title: "COFTOCHKA.COM — В'язаний одяг ручної роботи",
     description: "Затишний в'язаний одяг ручної роботи. Светри, кардигани, оверсайз. Зроблено в Україні.",
-    url: "https://coftochka.ua",
-    siteName: "COFTOCHKA.UA",
+    url: "https://www.coftochka.com",
+    siteName: "COFTOCHKA.COM",
     locale: "uk_UA",
     type: "website",
   },
   alternates: {
-    canonical: "https://coftochka.ua",
+    canonical: "https://www.coftochka.com",
   },
 };
 

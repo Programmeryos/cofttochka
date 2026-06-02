@@ -12,7 +12,7 @@ export const Logo = ({ light = false }: { light?: boolean }) => (
       C
     </div>
     <span className={`font-serif text-xl font-bold tracking-tight ${light ? 'text-white' : 'text-brand-dark'}`}>
-      COFTOCHKA<span className="text-brand-primary">.UA</span>
+      COFTOCHKA<span className="text-brand-primary">.COM</span>
     </span>
   </Link>
 );
