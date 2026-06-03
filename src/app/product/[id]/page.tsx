@@ -44,6 +44,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const product = await fetchProduct(id);
 
+
   const jsonLd = product
     ? {
         '@context': 'https://schema.org',
@@ -83,7 +84,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <ProductPageClient id={id} />
+      <ProductPageClient id={id} initialProduct={product ?? undefined} />
     </>
   );
 }

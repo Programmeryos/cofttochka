@@ -37,9 +37,10 @@ const RelatedProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-export const ProductPageClient = ({ id }: { id: string }) => {
+export const ProductPageClient = ({ id, initialProduct }: { id: string; initialProduct?: Product }) => {
   const router = useRouter();
-  const { data: product, isLoading, isError } = useGetProductByIdQuery(id);
+  const { data: fetchedProduct, isLoading, isError } = useGetProductByIdQuery(id);
+  const product = fetchedProduct ?? initialProduct;
   const { data: relatedData } = useGetProductsQuery(
     { categoryId: product?.categoryId ?? undefined, limit: 5 },
     { skip: !product?.categoryId }
@@ -51,7 +52,7 @@ export const ProductPageClient = ({ id }: { id: string }) => {
     if (isError) router.replace('/not-found');
   }, [isError, router]);
 
-  if (isLoading) {
+  if (isLoading && !initialProduct) {
     return (
       <>
         <Header />
