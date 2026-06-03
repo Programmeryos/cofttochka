@@ -54,6 +54,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             name: product.name,
             description: product.description ?? undefined,
             image: product.images?.map((img: { url: string }) => img.url) ?? [],
+            sku: product.id,
+            brand: {
+              '@type': 'Brand',
+              name: 'COFTOCHKA.COM',
+            },
             offers: {
               '@type': 'Offer',
               price: String(product.price),
@@ -61,6 +66,11 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               availability: product.inStock
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
+              itemCondition: 'https://schema.org/NewCondition',
+              seller: {
+                '@type': 'Organization',
+                name: 'COFTOCHKA.COM',
+              },
               url: `https://www.coftochka.com/product/${product.slug ?? id}`,
             },
           },
