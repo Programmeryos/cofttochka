@@ -3,11 +3,29 @@ import { Hero } from "@/components/sections/Hero";
 import { Catalog } from "@/components/sections/Catalog";
 import { AboutUs } from "@/components/sections/AboutUs";
 import { Footer } from "@/components/sections/Footer";
+import type { Product, Category } from "@/lib/api/types";
 
-export default function Home() {
+const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app';
+
+async function getInitialCatalogData(): Promise<{ products: Product[]; categories: Category[] }> {
+  try {
+    const [productsRes, categoriesRes] = await Promise.all([
+      fetch(`${API_BASE}/products?limit=100`, { next: { revalidate: 3600 } }),
+      fetch(`${API_BASE}/categories`, { next: { revalidate: 3600 } }),
+    ]);
+    const products: Product[] = productsRes.ok ? (await productsRes.json()).data : [];
+    const categories: Category[] = categoriesRes.ok ? await categoriesRes.json() : [];
+    return { products, categories };
+  } catch {
+    return { products: [], categories: [] };
+  }
+}
+
+export default async function Home() {
+  const { products, categories } = await getInitialCatalogData();
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "OnlineStore",
     "name": "COFTOCHKA.COM",
     "url": "https://www.coftochka.com",
     "logo": "https://www.coftochka.com/logo.png",
@@ -19,7 +37,7 @@ export default function Home() {
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+38-099-000-00-00",
+      "telephone": "+380688521018",
       "contactType": "customer service"
     }
   };
@@ -33,7 +51,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <Catalog />
+        <Catalog initialProducts={products} categories={categories} />
         <AboutUs />
       </main>
       <Footer />

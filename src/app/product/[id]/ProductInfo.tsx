@@ -82,7 +82,7 @@ export const ProductInfo = ({ product }: { product: Product }) => {
           <ShoppingBag size={22} />
           {product.inStock ? 'До кошика' : 'Немає в наявності'}
         </button>
-        <button className="w-16 h-16 border-2 border-neutral-200 rounded-full flex items-center justify-center text-neutral-400 hover:text-red-400 hover:border-red-400 transition-all active:scale-90">
+        <button aria-label="Додати до вибраного" className="w-16 h-16 border-2 border-neutral-200 rounded-full flex items-center justify-center text-neutral-400 hover:text-red-400 hover:border-red-400 transition-all active:scale-90">
           <Heart size={24} />
         </button>
       </div>

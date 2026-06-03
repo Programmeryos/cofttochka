@@ -3,22 +3,88 @@ import { ProductPageClient } from './ProductPageClient';
 
 const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app';
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params;
+async function fetchProduct(id: string) {
   try {
     const res = await fetch(`${API_BASE}/products/${id}`, { next: { revalidate: 3600 } });
-    if (!res.ok) return {};
-    const product = await res.json();
-    const slug = product.slug ?? id;
-    return {
-      alternates: { canonical: `https://www.coftochka.com/product/${slug}` },
-    };
+    if (!res.ok) return null;
+    return await res.json();
   } catch {
-    return {};
+    return null;
   }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const product = await fetchProduct(id);
+  if (!product) return {};
+
+  const slug = product.slug ?? id;
+  const title = `${product.name} — купити в COFTOCHKA.COM`;
+  const description = product.description
+    ? product.description.slice(0, 160)
+    : `${product.name} — в'язаний одяг ручної роботи. Ціна: ${Number(product.price).toLocaleString('uk-UA')} ₴. Доставка по Україні.`;
+  const imageUrl = product.images?.[0]?.url;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://www.coftochka.com/product/${slug}`,
+      siteName: 'COFTOCHKA.COM',
+      locale: 'uk_UA',
+      type: 'website',
+      ...(imageUrl && { images: [{ url: imageUrl, width: 1200, height: 630, alt: product.name }] }),
+    },
+    alternates: { canonical: `https://www.coftochka.com/product/${slug}` },
+  };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  return <ProductPageClient id={id} />;
+  const product = await fetchProduct(id);
+
+  const jsonLd = product
+    ? {
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Product',
+            name: product.name,
+            description: product.description ?? undefined,
+            image: product.images?.map((img: { url: string }) => img.url) ?? [],
+            offers: {
+              '@type': 'Offer',
+              price: String(product.price),
+              priceCurrency: 'UAH',
+              availability: product.inStock
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+              url: `https://www.coftochka.com/product/${product.slug ?? id}`,
+            },
+          },
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Головна', item: 'https://www.coftochka.com' },
+              { '@type': 'ListItem', position: 2, name: 'Каталог', item: 'https://www.coftochka.com/#catalog' },
+              { '@type': 'ListItem', position: 3, name: product.name, item: `https://www.coftochka.com/product/${product.slug ?? id}` },
+            ],
+          },
+        ],
+      }
+    : null;
+
+  return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
+      <ProductPageClient id={id} />
+    </>
+  );
 }

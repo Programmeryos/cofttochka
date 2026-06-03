@@ -6,8 +6,7 @@ import Link from 'next/link';
 import { Search, SlidersHorizontal, X, ShoppingBag, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
-import { useGetProductsQuery, useGetCategoriesQuery } from '@/lib/api';
-import type { Product } from '@/lib/api/types';
+import type { Product, Category } from '@/lib/api/types';
 
 type SortOption = 'default' | 'price_asc' | 'price_desc';
 
@@ -96,30 +95,18 @@ export const ProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-export const Catalog = () => {
+interface CatalogProps {
+  initialProducts: Product[];
+  categories: Category[];
+}
+
+export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(undefined);
   const [inStock, setInStock] = useState(false);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showFilters, setShowFilters] = useState(false);
-
-  const searchTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => setDebouncedSearch(value), 400);
-  };
-
-  const { data: categoriesData } = useGetCategoriesQuery();
-
-  const { data, isLoading, isError } = useGetProductsQuery({
-    search: debouncedSearch || undefined,
-    categoryId: selectedCategoryId,
-    inStock: inStock || undefined,
-    limit: 100,
-  });
 
   const toggleSize = (size: string) =>
     setSelectedSizes(prev =>
@@ -137,22 +124,31 @@ export const Catalog = () => {
     setSortBy('default');
     setSelectedCategoryId(undefined);
     setSearch('');
-    setDebouncedSearch('');
   };
 
   const filteredProducts = useMemo(() => {
-    const products = data?.data ?? [];
-    let result = selectedSizes.length > 0
-      ? products.filter(p => p.size && selectedSizes.includes(p.size))
-      : products;
+    let result = initialProducts;
+
+    if (selectedCategoryId) {
+      result = result.filter(p => p.categoryId === selectedCategoryId);
+    }
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = result.filter(p => p.name.toLowerCase().includes(q));
+    }
+    if (inStock) {
+      result = result.filter(p => p.inStock);
+    }
+    if (selectedSizes.length > 0) {
+      result = result.filter(p => p.size && selectedSizes.includes(p.size));
+    }
 
     switch (sortBy) {
-
-      case 'price_asc': return [...result].sort((a, b) => Number(a.price) - Number(b.price));
-      case 'price_desc':return [...result].sort((a, b) => Number(b.price) - Number(a.price));
-      default:          return result;
+      case 'price_asc':  return [...result].sort((a, b) => Number(a.price) - Number(b.price));
+      case 'price_desc': return [...result].sort((a, b) => Number(b.price) - Number(a.price));
+      default:           return result;
     }
-  }, [data, selectedSizes, sortBy]);
+  }, [initialProducts, selectedCategoryId, search, inStock, selectedSizes, sortBy]);
 
   return (
     <section id="catalog" className="py-24 bg-white">
@@ -169,7 +165,7 @@ export const Catalog = () => {
               >
                 Всі
               </button>
-              {categoriesData?.map(cat => (
+              {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategoryId(cat.id)}
@@ -192,7 +188,7 @@ export const Catalog = () => {
                 type="text"
                 placeholder="Пошук за назвою..."
                 value={search}
-                onChange={e => handleSearchChange(e.target.value)}
+                onChange={e => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-neutral-50 rounded-2xl border border-transparent focus:border-brand-primary focus:bg-white outline-none transition-all"
               />
             </div>
@@ -231,7 +227,6 @@ export const Catalog = () => {
               className="overflow-hidden"
             >
               <div className="py-6 mb-6 border-t border-b border-neutral-100 grid grid-cols-1 sm:grid-cols-3 gap-8">
-                {/* Size */}
                 <div>
                   <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">Розмір</h4>
                   <div className="flex flex-wrap gap-2">
@@ -251,7 +246,6 @@ export const Catalog = () => {
                   </div>
                 </div>
 
-                {/* In Stock */}
                 <div>
                   <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">Наявність</h4>
                   <button
@@ -269,7 +263,6 @@ export const Catalog = () => {
                   </button>
                 </div>
 
-                {/* Sort */}
                 <div>
                   <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">Сортування</h4>
                   <div className="flex flex-col gap-1">
@@ -297,46 +290,24 @@ export const Catalog = () => {
           Знайдено: <span className="font-semibold text-brand-dark">{filteredProducts.length}</span> товарів
         </p>
 
-        {isLoading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-4/5 bg-neutral-100 rounded-2xl" />
-                <div className="mt-4 h-5 bg-neutral-100 rounded-lg w-3/4" />
-                <div className="mt-2 h-4 bg-neutral-100 rounded-lg w-1/2" />
-              </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+          <AnimatePresence mode="popLayout">
+            {filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
             ))}
-          </div>
-        )}
+          </AnimatePresence>
+        </div>
 
-        {isError && (
+        {filteredProducts.length === 0 && (
           <div className="py-24 text-center">
-            <p className="text-neutral-400 font-serif italic text-xl">Не вдалося завантажити товари</p>
+            <p className="text-neutral-400 font-serif italic text-xl">Нічого не знайдено...</p>
+            <button
+              onClick={resetFilters}
+              className="mt-6 px-6 py-2.5 bg-brand-dark text-white rounded-full text-sm hover:bg-brand-secondary transition-colors"
+            >
+              Скинути всі фільтри
+            </button>
           </div>
-        )}
-
-        {!isLoading && !isError && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-              <AnimatePresence mode="popLayout">
-                {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </AnimatePresence>
-            </div>
-
-            {filteredProducts.length === 0 && (
-              <div className="py-24 text-center">
-                <p className="text-neutral-400 font-serif italic text-xl">Нічого не знайдено...</p>
-                <button
-                  onClick={resetFilters}
-                  className="mt-6 px-6 py-2.5 bg-brand-dark text-white rounded-full text-sm hover:bg-brand-secondary transition-colors"
-                >
-                  Скинути всі фільтри
-                </button>
-              </div>
-            )}
-          </>
         )}
       </div>
     </section>

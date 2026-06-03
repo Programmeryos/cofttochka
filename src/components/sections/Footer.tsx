@@ -62,7 +62,7 @@ export const Footer = () => {
         </div>
 
         <div className="pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
-          <p>© 2025 COFTOCHKA.COM. Усі права захищені.</p>
+          <p>© 2026 COFTOCHKA.COM. Усі права захищені.</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-white transition-colors">Політика конфіденційності</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Умови використання</Link>
