@@ -96,7 +96,12 @@ export const ProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-export const Catalog = () => {
+interface CatalogProps {
+  initialProducts?: Product[];
+  initialCategories?: import('@/lib/api/types').Category[];
+}
+
+export const Catalog = ({ initialProducts = [], initialCategories = [] }: CatalogProps) => {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(undefined);
@@ -112,7 +117,8 @@ export const Catalog = () => {
     searchTimer.current = setTimeout(() => setDebouncedSearch(value), 400);
   };
 
-  const { data: categoriesData } = useGetCategoriesQuery();
+  const { data: categoriesQueryData } = useGetCategoriesQuery();
+  const categoriesData = categoriesQueryData ?? initialCategories;
 
   const { data, isLoading, isError } = useGetProductsQuery({
     search: debouncedSearch || undefined,
@@ -141,7 +147,7 @@ export const Catalog = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    const products = data?.data ?? [];
+    const products = data?.data ?? initialProducts;
     let result = selectedSizes.length > 0
       ? products.filter(p => p.size && selectedSizes.includes(p.size))
       : products;
@@ -297,7 +303,7 @@ export const Catalog = () => {
           Знайдено: <span className="font-semibold text-brand-dark">{filteredProducts.length}</span> товарів
         </p>
 
-        {isLoading && (
+        {isLoading && initialProducts.length === 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="animate-pulse">
@@ -315,7 +321,7 @@ export const Catalog = () => {
           </div>
         )}
 
-        {!isLoading && !isError && (
+        {(!isLoading || initialProducts.length > 0) && !isError && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               <AnimatePresence mode="popLayout">

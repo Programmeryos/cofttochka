@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { ProductPageClient } from './ProductPageClient';
-
-const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app';
+import { API_BASE } from '@/lib/api/config';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;

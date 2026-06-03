@@ -3,8 +3,19 @@ import { Hero } from "@/components/sections/Hero";
 import { Catalog } from "@/components/sections/Catalog";
 import { AboutUs } from "@/components/sections/AboutUs";
 import { Footer } from "@/components/sections/Footer";
+import type { Product, Category } from "@/lib/api/types";
+import { API_BASE } from "@/lib/api/config";
 
-export default function Home() {
+export default async function Home() {
+  const [productsRes, categoriesRes] = await Promise.all([
+    fetch(`${API_BASE}/products?limit=100`, { next: { revalidate: 3600 } }).catch(() => null),
+    fetch(`${API_BASE}/categories`, { next: { revalidate: 3600 } }).catch(() => null),
+  ]);
+
+  const productsData = productsRes?.ok ? await productsRes.json() : { data: [], total: 0 };
+  const categoriesData: Category[] = categoriesRes?.ok ? await categoriesRes.json() : [];
+  const initialProducts: Product[] = productsData.data ?? [];
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -33,7 +44,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <Catalog />
+        <Catalog initialProducts={initialProducts} initialCategories={categoriesData} />
         <AboutUs />
       </main>
       <Footer />
