@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export const Hero = () => {
   return (
-    <section className="relative h-[80vh] flex items-center overflow-hidden bg-brand-light">
+    <section className="relative min-h-[80vh] h-auto flex items-center overflow-hidden bg-brand-light py-16 md:py-0">
       {/* Background Pattern/Texture Placeholder */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #D4A373 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
@@ -19,7 +19,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-5xl md:text-7xl font-serif font-bold leading-tight mb-6"
+            className="text-4xl sm:text-5xl md:text-7xl font-serif font-bold leading-tight mb-4 md:mb-6"
           >
             В&apos;язаний одяг, <br />
             <span className="text-brand-primary italic">який обіймає</span>
@@ -29,7 +29,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-neutral-600 mb-10 max-w-lg leading-relaxed"
+            className="text-base md:text-xl text-neutral-600 mb-6 md:mb-10 max-w-lg leading-relaxed"
           >
             Ручна робота з душею. Натуральна пряжа, сучасний крій та затишок у кожній петельці для вашого ідеального образу.
           </motion.p>

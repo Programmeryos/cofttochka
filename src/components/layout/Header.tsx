@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ShoppingCart, Menu } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,9 +50,6 @@ export const Header = () => {
                 </motion.span>
               )}
             </AnimatePresence>
-          </button>
-          <button className="md:hidden p-2 hover:bg-neutral-50 rounded-full transition-colors">
-            <Menu size={24} strokeWidth={1.5} />
           </button>
         </div>
       </div>

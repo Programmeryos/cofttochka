@@ -50,7 +50,7 @@ export const Footer = () => {
           </div>
 
           {/* Право: велике лого */}
-          <div className="flex justify-end items-start">
+          <div className="hidden md:flex justify-end items-start">
             <Image
               src="/logo.svg"
               alt="COFTOCHKA.COM"
