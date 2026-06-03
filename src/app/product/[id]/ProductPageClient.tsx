@@ -15,7 +15,7 @@ import type { Product } from '@/lib/api/types';
 const RelatedProductCard = ({ product }: { product: Product }) => {
   const image = product.images[0]?.url;
   return (
-    <Link href={`/product/${product.id}`} className="group block">
+    <Link href={`/product/${product.slug ?? product.id}`} className="group block">
       <div className="aspect-4/5 bg-brand-light rounded-2xl overflow-hidden relative mb-4">
         {image ? (
           <Image

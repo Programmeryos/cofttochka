@@ -40,7 +40,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
       className="group relative"
     >
       <div className="aspect-4/5 bg-brand-light relative overflow-hidden rounded-2xl">
-        <Link href={`/product/${product.id}`} className="block w-full h-full">
+        <Link href={`/product/${product.slug ?? product.id}`} className="block w-full h-full">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -77,7 +77,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
       </div>
 
       <div className="mt-4 px-1">
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/product/${product.slug ?? product.id}`}>
           <h3 className="font-serif text-lg font-bold group-hover:text-brand-primary transition-colors">
             {product.name}
           </h3>

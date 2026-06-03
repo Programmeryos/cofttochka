@@ -178,7 +178,7 @@ export const CartDrawer = () => {
                     <div className="space-y-6">
                       {items.map(item => (
                         <div key={item.productId} className="flex gap-4 group">
-                          <Link href={`/product/${item.productId}`} onClick={handleClose} className="shrink-0">
+                          <Link href={`/product/${item.slug ?? item.productId}`} onClick={handleClose} className="shrink-0">
                             <div className="w-24 h-32 bg-brand-light relative rounded-xl overflow-hidden">
                               {item.image
                                 ? <Image src={item.image} alt={item.name} fill className="object-cover" />
@@ -188,7 +188,7 @@ export const CartDrawer = () => {
                           </Link>
                           <div className="flex-1 flex flex-col py-1">
                             <div className="flex justify-between items-start mb-1">
-                              <Link href={`/product/${item.productId}`} onClick={handleClose}>
+                              <Link href={`/product/${item.slug ?? item.productId}`} onClick={handleClose}>
                                 <h4 className="font-serif font-bold text-sm hover:text-brand-primary transition-colors">{item.name}</h4>
                               </Link>
                               <button onClick={() => removeItem(item.productId)} className="text-neutral-300 hover:text-red-400 transition-colors">

@@ -3,24 +3,24 @@ import type { ProductsResponse } from '@/lib/api/types'
 
 const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app'
 
-async function getAllProductIds(): Promise<string[]> {
+async function getAllProducts(): Promise<{ id: string; slug: string | null }[]> {
   try {
     const res = await fetch(`${API_BASE}/products?limit=1000`, {
       next: { revalidate: 3600 },
     })
     if (!res.ok) return []
     const json: ProductsResponse = await res.json()
-    return json.data.map((p) => p.id)
+    return json.data.map((p) => ({ id: p.id, slug: p.slug ?? null }))
   } catch {
     return []
   }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const productIds = await getAllProductIds()
+  const products = await getAllProducts()
 
-  const productPages: MetadataRoute.Sitemap = productIds.map((id) => ({
-    url: `https://www.coftochka.com/product/${id}`,
+  const productPages: MetadataRoute.Sitemap = products.map((p) => ({
+    url: `https://www.coftochka.com/product/${p.slug ?? p.id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
     priority: 0.8,

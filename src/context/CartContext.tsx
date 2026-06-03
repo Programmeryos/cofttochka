@@ -5,6 +5,7 @@ import type { Product, ProductSize } from '@/lib/api/types';
 
 export interface CartItem {
   productId: string;
+  slug: string | null;
   name: string;
   image: string | null;
   size: ProductSize | null;
@@ -53,6 +54,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       if (prev.find(item => item.productId === product.id)) return prev;
       return [...prev, {
         productId: product.id,
+        slug: product.slug ?? null,
         name: product.name,
         image: product.images[0]?.url ?? null,
         size: product.size,
