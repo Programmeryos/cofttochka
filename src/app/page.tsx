@@ -12,13 +12,13 @@ export default async function Home() {
     fetch(`${API_BASE}/categories`, { next: { revalidate: 3600 } }).catch(() => null),
   ]);
 
-  const productsData = productsRes?.ok ? await productsRes.json() : { data: [], total: 0 };
-  const categoriesData: Category[] = categoriesRes?.ok ? await categoriesRes.json() : [];
+  const productsData = productsRes?.ok ? await productsRes.json() : { data: [] };
   const initialProducts: Product[] = productsData.data ?? [];
+  const categories: Category[] = categoriesRes?.ok ? await categoriesRes.json() : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "OnlineStore",
     "name": "COFTOCHKA.COM",
     "url": "https://www.coftochka.com",
     "logo": "https://www.coftochka.com/logo.png",
@@ -30,7 +30,7 @@ export default async function Home() {
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+38-099-000-00-00",
+      "telephone": "+380688521018",
       "contactType": "customer service"
     }
   };
@@ -44,7 +44,7 @@ export default async function Home() {
       <Header />
       <main>
         <Hero />
-        <Catalog initialProducts={initialProducts} initialCategories={categoriesData} />
+        <Catalog initialProducts={initialProducts} categories={categories} />
         <AboutUs />
       </main>
       <Footer />

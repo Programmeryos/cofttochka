@@ -40,6 +40,14 @@ export const metadata: Metadata = {
     siteName: "COFTOCHKA.COM",
     locale: "uk_UA",
     type: "website",
+    images: [
+      {
+        url: "https://www.coftochka.com/logo.png",
+        width: 512,
+        height: 512,
+        alt: "COFTOCHKA.COM — В'язаний одяг ручної роботи",
+      },
+    ],
   },
   alternates: {
     canonical: "https://www.coftochka.com",
