@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShoppingBag, Truck, RefreshCw, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import type { Product } from '@/lib/api/types';
 
@@ -19,19 +19,14 @@ const Accordion = ({ title, children }: { title: string; children: React.ReactNo
         </span>
         <ChevronDown size={18} className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="pb-6 text-neutral-600 leading-relaxed text-sm">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <motion.div
+        initial={false}
+        animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        className="overflow-hidden"
+      >
+        <div className="pb-6 text-neutral-600 leading-relaxed text-sm">{children}</div>
+      </motion.div>
     </div>
   );
 };
