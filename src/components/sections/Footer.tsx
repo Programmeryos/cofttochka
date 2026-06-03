@@ -44,8 +44,8 @@ export const Footer = () => {
             </div>
             <p className="text-sm text-neutral-400">
               Київ, Україна <br />
-              <a href="tel:+380688521018" className="hover:text-brand-primary transition-colors">+38 0688521018</a> <br />
-              <a href="mailto:romandricik@gmail.com" className="hover:text-brand-primary transition-colors">romandricik@gmail.com</a>
+              <a href="tel:+380688521018" className="inline-block py-1.5 hover:text-brand-primary transition-colors">+38 0688521018</a> <br />
+              <a href="mailto:romandricik@gmail.com" className="inline-block py-1.5 hover:text-brand-primary transition-colors">romandricik@gmail.com</a>
             </p>
           </div>
 
@@ -61,7 +61,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
+        <div className="pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-400">
           <p>© 2026 COFTOCHKA.COM. Усі права захищені.</p>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-white transition-colors">Політика конфіденційності</Link>

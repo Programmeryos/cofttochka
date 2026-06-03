@@ -35,7 +35,7 @@ export const AboutUs = () => {
                     <item.icon size={24} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg mb-1">{item.title}</h4>
+                    <h3 className="font-bold text-lg mb-1">{item.title}</h3>
                     <p className="text-neutral-500 text-sm leading-relaxed">{item.text}</p>
                   </div>
                 </div>

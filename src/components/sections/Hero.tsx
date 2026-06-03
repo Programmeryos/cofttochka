@@ -1,4 +1,3 @@
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -27,7 +26,7 @@ export const Hero = () => {
           <div className="animate-slide-up [animation-delay:0.4s]">
             <Link
               href="#catalog"
-              className="inline-block bg-brand-primary text-white px-10 py-4 rounded-full font-medium text-lg hover:bg-brand-secondary transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95"
+              className="inline-block bg-brand-dark text-white px-10 py-4 rounded-full font-medium text-lg hover:bg-neutral-700 transition-all hover:shadow-lg hover:-translate-y-1 active:scale-95"
             >
               Переглянути колекцію
             </Link>
