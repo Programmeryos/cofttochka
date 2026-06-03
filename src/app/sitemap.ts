@@ -26,12 +26,17 @@ async function getAllProducts(): Promise<{ id: string; slug: string | null }[]> 
   }
 }
 
+function isoDate(): string {
+  return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getAllProducts()
+  const now = isoDate()
 
   const productPages: MetadataRoute.Sitemap = products.map((p) => ({
     url: `https://www.coftochka.com/product/${p.slug ?? p.id}`,
-    lastModified: new Date(),
+    lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
@@ -39,20 +44,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     {
       url: 'https://www.coftochka.com',
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'weekly',
       priority: 1,
     },
     ...productPages,
     {
       url: 'https://www.coftochka.com/privacy',
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: 'https://www.coftochka.com/terms',
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
