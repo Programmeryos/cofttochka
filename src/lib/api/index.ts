@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { API_BASE } from './config';
 import type {
   Category,
   Product,
@@ -15,9 +16,7 @@ import type {
 
 export const coftochkaApi = createApi({
   reducerPath: 'coftochkaApi',
-  baseQuery: fetchBaseQuery({
-    baseUrl: 'https://hospitable-manifestation-production-dc1f.up.railway.app',
-  }),
+  baseQuery: fetchBaseQuery({ baseUrl: API_BASE }),
   endpoints: (builder) => ({
     // Categories
     getCategories: builder.query<Category[], void>({

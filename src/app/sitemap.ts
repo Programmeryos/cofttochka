@@ -1,7 +1,6 @@
 import { MetadataRoute } from 'next'
 import type { ProductsResponse } from '@/lib/api/types'
-
-const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app'
+import { API_BASE } from '@/lib/api/config'
 
 async function getAllProducts(): Promise<{ id: string; slug: string | null }[]> {
   try {

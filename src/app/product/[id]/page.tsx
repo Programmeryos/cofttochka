@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { ProductPageClient } from './ProductPageClient';
-
-const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app';
+import { API_BASE } from '@/lib/api/config';
 
 async function fetchProduct(id: string) {
   try {

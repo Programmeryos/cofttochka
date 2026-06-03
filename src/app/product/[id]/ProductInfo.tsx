@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShoppingBag, Heart, Truck, RefreshCw, ChevronDown } from 'lucide-react';
+import { ShoppingBag, Truck, RefreshCw, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import type { Product } from '@/lib/api/types';
@@ -82,9 +82,6 @@ export const ProductInfo = ({ product }: { product: Product }) => {
           <ShoppingBag size={22} />
           {product.inStock ? 'До кошика' : 'Немає в наявності'}
         </button>
-        <button aria-label="Додати до вибраного" className="w-16 h-16 border-2 border-neutral-200 rounded-full flex items-center justify-center text-neutral-400 hover:text-red-400 hover:border-red-400 transition-all active:scale-90">
-          <Heart size={24} />
-        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-4 py-8 border-t border-neutral-100 mb-8">
@@ -93,7 +90,7 @@ export const ProductInfo = ({ product }: { product: Product }) => {
             <Truck size={20} strokeWidth={1.5} />
           </div>
           <span className="text-xs font-medium text-neutral-500 leading-tight">
-            Безкоштовна доставка <br /> від 1500 ₴
+            Доставка по всій <br /> Україні
           </span>
         </div>
         <div className="flex items-center gap-3">

@@ -58,6 +58,7 @@ export const CartDrawer = () => {
   const [formError, setFormError] = useState('');
   const [touched, setTouched] = useState<Partial<Record<keyof FormErrors, boolean>>>({});
 
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [createOrder, { isLoading: isSubmitting }] = useCreateOrderMutation();
 
   useEffect(() => {
@@ -67,7 +68,7 @@ export const CartDrawer = () => {
 
   const handleClose = () => {
     closeCart();
-    setTimeout(() => { setStep('cart'); setForm(EMPTY_FORM); setErrors({}); setTouched({}); setFormError(''); }, 300);
+    setTimeout(() => { setStep('cart'); setForm(EMPTY_FORM); setErrors({}); setTouched({}); setFormError(''); setAgreedToTerms(false); }, 300);
   };
 
   const handleBlur = (key: keyof FormErrors) => {
@@ -264,10 +265,31 @@ export const CartDrawer = () => {
                   )}
                 </div>
 
-                <div className="p-6 border-t border-neutral-100 bg-neutral-50/50 shrink-0">
+                <div className="p-6 border-t border-neutral-100 bg-neutral-50/50 shrink-0 space-y-4">
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <div className={`mt-0.5 w-5 h-5 rounded-md border-2 shrink-0 flex items-center justify-center transition-colors ${agreedToTerms ? 'bg-brand-primary border-brand-primary' : 'border-neutral-300 group-hover:border-brand-primary'}`}>
+                      {agreedToTerms && (
+                        <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
+                          <path d="M1 4L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                    <input
+                      type="checkbox"
+                      className="sr-only"
+                      checked={agreedToTerms}
+                      onChange={e => setAgreedToTerms(e.target.checked)}
+                    />
+                    <span className="text-xs text-neutral-500 leading-relaxed">
+                      Підтверджуючи замовлення, ви погоджуєтесь з{' '}
+                      <Link href="/terms" onClick={handleClose} className="text-brand-primary underline underline-offset-2 hover:text-brand-secondary">умовами використання</Link>
+                      {' '}та{' '}
+                      <Link href="/privacy" onClick={handleClose} className="text-brand-primary underline underline-offset-2 hover:text-brand-secondary">політикою конфіденційності</Link>
+                    </span>
+                  </label>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !agreedToTerms}
                     className="w-full bg-brand-primary text-white py-5 rounded-full font-bold text-lg hover:bg-brand-secondary transition-all hover:shadow-xl active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Відправляємо...' : 'Підтвердити замовлення'}
