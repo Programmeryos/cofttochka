@@ -140,7 +140,7 @@ export default function PrivacyPage() {
                           ['Необхідні', 'Базове функціонування, кошик', '30 днів'],
                           ['Функціональні', 'Запам&apos;ятовування уподобань', '1 рік'],
                           ['Аналітичні', 'Статистика відвідувань', '2 роки'],
-                          ['Маркетингові', 'Таргетована реклама', '1 рік'],
+                          ['Маркетингові', 'Таргетована реклама', '1 місяць'],
                         ].map(([type, desc, term]) => (
                           <tr key={type} className="hover:bg-neutral-50 transition-colors">
                             <td className="p-3 border border-neutral-200 font-bold">{type}</td>
