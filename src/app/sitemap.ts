@@ -1,9 +1,26 @@
 import { MetadataRoute } from 'next'
-import { PRODUCTS } from '@/data/products'
+import type { ProductsResponse } from '@/lib/api/types'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const productPages: MetadataRoute.Sitemap = PRODUCTS.map((product) => ({
-    url: `https://www.coftochka.com/product/${product.slug}`,
+const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.app'
+
+async function getAllProductIds(): Promise<string[]> {
+  try {
+    const res = await fetch(`${API_BASE}/products?limit=1000`, {
+      next: { revalidate: 3600 },
+    })
+    if (!res.ok) return []
+    const json: ProductsResponse = await res.json()
+    return json.data.map((p) => p.id)
+  } catch {
+    return []
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const productIds = await getAllProductIds()
+
+  const productPages: MetadataRoute.Sitemap = productIds.map((id) => ({
+    url: `https://www.coftochka.com/product/${id}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
     priority: 0.8,
