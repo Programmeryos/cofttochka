@@ -12,7 +12,7 @@ export const Logo = ({ light = false }: { light?: boolean }) => (
       C
     </div>
     <span className={`font-serif text-xl font-bold tracking-tight ${light ? 'text-white' : 'text-brand-dark'}`}>
-      COFTOCHKA<span className="text-brand-primary">.COM</span>
+      COFTOCHKA<span className="text-brand-secondary">.COM</span>
     </span>
   </Link>
 );
@@ -32,8 +32,9 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={openCart}
+            aria-label="Відкрити кошик"
             className="relative p-2 hover:bg-neutral-50 rounded-full transition-colors group"
           >
             <ShoppingCart size={24} strokeWidth={1.5} className="group-hover:scale-110 transition-transform" />

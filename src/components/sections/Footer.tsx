@@ -31,14 +31,14 @@ export const Footer = () => {
           <div>
             <h4 className="font-serif font-bold text-lg mb-6">Зв&apos;язатися з нами</h4>
             <div className="flex gap-4 mb-6">
-              <a href="https://www.instagram.com/alla_thalanchyk?igsh=dDAzZXNrYmVwYW4z" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors">
+              <a href="https://www.instagram.com/alla_thalanchyk?igsh=dDAzZXNrYmVwYW4z" target="_blank" rel="noopener noreferrer" aria-label="Instagram COFTOCHKA" className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                   <circle cx="12" cy="12" r="4"/>
                   <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
                 </svg>
               </a>
-              <a href="tel:+380688521018" className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors">
+              <a href="tel:+380688521018" aria-label="Зателефонувати" className="w-10 h-10 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-brand-primary transition-colors">
                 <Phone size={20} />
               </a>
             </div>

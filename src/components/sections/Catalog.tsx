@@ -83,10 +83,10 @@ export const ProductCard = ({ product }: { product: Product }) => {
         </Link>
         <div className="flex items-center gap-2 mt-1.5">
           {product.category && (
-            <span className="text-xs text-neutral-400">{product.category.name}</span>
+            <span className="text-xs text-neutral-500">{product.category.name}</span>
           )}
           {product.size && (
-            <span className="text-xs text-neutral-400 ml-auto">{product.size}</span>
+            <span className="text-xs text-neutral-500 ml-auto">{product.size}</span>
           )}
         </div>
         <p className="mt-2 font-bold text-lg">{Number(product.price).toLocaleString('uk-UA')} ₴</p>
@@ -194,6 +194,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
             </div>
             <button
               onClick={() => setShowFilters(prev => !prev)}
+              aria-label="Фільтри"
               className={`relative p-3 rounded-2xl transition-colors ${
                 showFilters ? 'bg-brand-dark text-white' : 'bg-neutral-50 hover:bg-neutral-100'
               }`}
@@ -286,7 +287,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
           )}
         </AnimatePresence>
 
-        <p className="text-sm text-neutral-400 mb-8">
+        <p className="text-sm text-neutral-500 mb-8">
           Знайдено: <span className="font-semibold text-brand-dark">{filteredProducts.length}</span> товарів
         </p>
 
