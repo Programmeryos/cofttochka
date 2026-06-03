@@ -5,12 +5,23 @@ const API_BASE = 'https://hospitable-manifestation-production-dc1f.up.railway.ap
 
 async function getAllProducts(): Promise<{ id: string; slug: string | null }[]> {
   try {
-    const res = await fetch(`${API_BASE}/products?limit=1000`, {
+    const limit = 100
+    const first = await fetch(`${API_BASE}/products?limit=${limit}&page=1`, {
       next: { revalidate: 3600 },
     })
-    if (!res.ok) return []
-    const json: ProductsResponse = await res.json()
-    return json.data.map((p) => ({ id: p.id, slug: p.slug ?? null }))
+    if (!first.ok) return []
+    const firstJson: ProductsResponse = await first.json()
+    const all = [...firstJson.data]
+    const totalPages = Math.ceil(firstJson.total / limit)
+    for (let page = 2; page <= totalPages; page++) {
+      const res = await fetch(`${API_BASE}/products?limit=${limit}&page=${page}`, {
+        next: { revalidate: 3600 },
+      })
+      if (!res.ok) break
+      const json: ProductsResponse = await res.json()
+      all.push(...json.data)
+    }
+    return all.map((p) => ({ id: p.id, slug: p.slug ?? null }))
   } catch {
     return []
   }
