@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, SlidersHorizontal, X, ShoppingBag, Check } from 'lucide-react';
@@ -11,6 +11,7 @@ import type { Product, Category } from '@/lib/api/types';
 type SortOption = 'default' | 'price_asc' | 'price_desc';
 
 const ITEMS_PER_PAGE = 6;
+const LOAD_MORE_STEP = 6;
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'default', label: 'За замовчуванням' },
@@ -109,10 +110,10 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showFilters, setShowFilters] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
-    setCurrentPage(1);
+    setVisibleCount(ITEMS_PER_PAGE);
   }, [selectedCategoryId, search, inStock, selectedSizes, sortBy]);
 
   const toggleSize = (size: string) =>
@@ -131,7 +132,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
     setSortBy('default');
     setSelectedCategoryId(undefined);
     setSearch('');
-    setCurrentPage(1);
+    setVisibleCount(ITEMS_PER_PAGE);
   };
 
   const filteredProducts = useMemo(() => {
@@ -158,28 +159,12 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
     }
   }, [initialProducts, selectedCategoryId, search, inStock, selectedSizes, sortBy]);
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const pagedProducts = filteredProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredProducts.length;
 
-  const goToPage = (page: number) => {
-    setCurrentPage(page);
-    document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const pageNumbers = useMemo(() => {
-    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-    const pages: (number | '...')[] = [1];
-    if (currentPage > 3) pages.push('...');
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-      pages.push(i);
-    }
-    if (currentPage < totalPages - 2) pages.push('...');
-    pages.push(totalPages);
-    return pages;
-  }, [totalPages, currentPage]);
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + LOAD_MORE_STEP);
+  }, []);
 
   return (
     <section id="catalog" className="py-24 bg-white">
@@ -336,50 +321,19 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               <AnimatePresence mode="popLayout">
-                {pagedProducts.map(product => (
+                {visibleProducts.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </AnimatePresence>
             </div>
 
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-16">
+            {hasMore && (
+              <div className="mt-16 flex justify-center">
                 <button
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="w-10 h-10 rounded-full flex items-center justify-center border border-neutral-200 text-neutral-500 hover:border-brand-dark hover:text-brand-dark transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Попередня сторінка"
+                  onClick={loadMore}
+                  className="px-10 py-4 border-2 border-brand-dark text-brand-dark rounded-full font-medium hover:bg-brand-dark hover:text-white transition-all active:scale-95"
                 >
-                  ‹
-                </button>
-
-                {pageNumbers.map((page, i) =>
-                  page === '...' ? (
-                    <span key={`ellipsis-${i}`} className="w-10 h-10 flex items-center justify-center text-neutral-400 text-sm">
-                      …
-                    </span>
-                  ) : (
-                    <button
-                      key={page}
-                      onClick={() => goToPage(page)}
-                      className={`w-10 h-10 rounded-full text-sm font-medium transition-all ${
-                        currentPage === page
-                          ? 'bg-brand-dark text-white'
-                          : 'border border-neutral-200 text-neutral-600 hover:border-brand-dark hover:text-brand-dark'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                )}
-
-                <button
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="w-10 h-10 rounded-full flex items-center justify-center border border-neutral-200 text-neutral-500 hover:border-brand-dark hover:text-brand-dark transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                  aria-label="Наступна сторінка"
-                >
-                  ›
+                  Показати ще ({filteredProducts.length - visibleCount})
                 </button>
               </div>
             )}
