@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, SlidersHorizontal, X, ShoppingBag, Check } from 'lucide-react';
@@ -9,6 +9,8 @@ import { useCart } from '@/context/CartContext';
 import type { Product, Category } from '@/lib/api/types';
 
 type SortOption = 'default' | 'price_asc' | 'price_desc';
+
+const ITEMS_PER_PAGE = 6;
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'default', label: 'За замовчуванням' },
@@ -107,6 +109,11 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategoryId, search, inStock, selectedSizes, sortBy]);
 
   const toggleSize = (size: string) =>
     setSelectedSizes(prev =>
@@ -124,6 +131,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
     setSortBy('default');
     setSelectedCategoryId(undefined);
     setSearch('');
+    setCurrentPage(1);
   };
 
   const filteredProducts = useMemo(() => {
@@ -149,6 +157,29 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
       default:           return result;
     }
   }, [initialProducts, selectedCategoryId, search, inStock, selectedSizes, sortBy]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const pagedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const pageNumbers = useMemo(() => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages: (number | '...')[] = [1];
+    if (currentPage > 3) pages.push('...');
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      pages.push(i);
+    }
+    if (currentPage < totalPages - 2) pages.push('...');
+    pages.push(totalPages);
+    return pages;
+  }, [totalPages, currentPage]);
 
   return (
     <section id="catalog" className="py-24 bg-white">
@@ -291,15 +322,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
           Знайдено: <span className="font-semibold text-brand-dark">{filteredProducts.length}</span> товарів
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {filteredProducts.length === 0 && (
+        {filteredProducts.length === 0 ? (
           <div className="py-24 text-center">
             <p className="text-neutral-400 font-serif italic text-xl">Нічого не знайдено...</p>
             <button
@@ -309,6 +332,58 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
               Скинути всі фільтри
             </button>
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+              <AnimatePresence mode="popLayout">
+                {pagedProducts.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-16">
+                <button
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 rounded-full flex items-center justify-center border border-neutral-200 text-neutral-500 hover:border-brand-dark hover:text-brand-dark transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Попередня сторінка"
+                >
+                  ‹
+                </button>
+
+                {pageNumbers.map((page, i) =>
+                  page === '...' ? (
+                    <span key={`ellipsis-${i}`} className="w-10 h-10 flex items-center justify-center text-neutral-400 text-sm">
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={page}
+                      onClick={() => goToPage(page)}
+                      className={`w-10 h-10 rounded-full text-sm font-medium transition-all ${
+                        currentPage === page
+                          ? 'bg-brand-dark text-white'
+                          : 'border border-neutral-200 text-neutral-600 hover:border-brand-dark hover:text-brand-dark'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 rounded-full flex items-center justify-center border border-neutral-200 text-neutral-500 hover:border-brand-dark hover:text-brand-dark transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                  aria-label="Наступна сторінка"
+                >
+                  ›
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </section>
