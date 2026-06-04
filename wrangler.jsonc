@@ -1,0 +1,30 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "cofttochka",
+	"compatibility_date": "2026-06-05",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			// Self-reference service binding for ISR cache invalidation
+			// The service name must match the worker name above
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "cofttochka"
+		}
+	],
+	"r2_buckets": [
+		{
+			// Run before first deploy: npx wrangler r2 bucket create cofttochka-opennext-cache
+			"binding": "NEXT_INC_CACHE_R2_BUCKET",
+			"bucket_name": "cofttochka-opennext-cache"
+		}
+	],
+	"images": {
+		// Cloudflare Images binding for next/image optimization
+		"binding": "IMAGES"
+	}
+}
