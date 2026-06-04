@@ -172,6 +172,15 @@ export const ProductReviews = ({
   const hasReviewed = submitted || checkData?.hasReview;
   const hasMore = reviewCount > allReviews.length;
 
+  useEffect(() => {
+    if (allReviews.length === 0 && reviewCount > 0) {
+      triggerGetReviews({ productId, page: 1, limit: LIMIT }).then(result => {
+        if (result.data?.data.length) setAllReviews(result.data.data);
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleShowMore = async () => {
     setIsFetchingMore(true);
     const result = await triggerGetReviews({ productId, page: currentPage + 1, limit: LIMIT });
@@ -205,49 +214,51 @@ export const ProductReviews = ({
         )}
       </div>
 
-      <AnimatePresence initial={false}>
-        {allReviews.length === 0 && (
-          <p className="text-neutral-400 text-sm">Поки що відгуків немає. Будьте першим!</p>
-        )}
-        {allReviews.map((r) => (
-          <motion.div
-            key={r.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="border-b border-neutral-100 py-6 last:border-0"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <StarRow value={r.rating} size={16} />
-              <span className="text-xs text-neutral-400">
-                {new Date(r.createdAt).toLocaleDateString('uk-UA', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </span>
-            </div>
-            {r.text && <p className="text-sm text-neutral-600 leading-relaxed">{r.text}</p>}
-          </motion.div>
-        ))}
-      </AnimatePresence>
-
-      {hasMore && (
-        <button
-          onClick={handleShowMore}
-          disabled={isFetchingMore}
-          className="mt-6 px-8 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:border-brand-primary hover:text-brand-primary transition-colors disabled:opacity-50"
-        >
-          {isFetchingMore ? 'Завантаження...' : `Показати ще (${reviewCount - allReviews.length})`}
-        </button>
-      )}
-
       {deviceId && (
         hasReviewed ? (
-          <p className="mt-8 text-sm text-neutral-400 italic">Ви вже залишили відгук. Дякуємо!</p>
+          <p className="mb-8 text-sm text-neutral-400 italic">Ви вже залишили відгук. Дякуємо!</p>
         ) : (
           <ReviewForm productId={productId} deviceId={deviceId} onSuccess={handleSuccess} />
         )
       )}
+
+      <div className="mt-10">
+        <AnimatePresence initial={false}>
+          {allReviews.length === 0 && reviewCount === 0 && (
+            <p className="text-neutral-400 text-sm">Поки що відгуків немає. Будьте першим!</p>
+          )}
+          {allReviews.map((r) => (
+            <motion.div
+              key={r.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="border-b border-neutral-100 py-6 last:border-0"
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <StarRow value={r.rating} size={16} />
+                <span className="text-xs text-neutral-400">
+                  {new Date(r.createdAt).toLocaleDateString('uk-UA', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </span>
+              </div>
+              {r.text && <p className="text-sm text-neutral-600 leading-relaxed">{r.text}</p>}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {hasMore && (
+          <button
+            onClick={handleShowMore}
+            disabled={isFetchingMore}
+            className="mt-6 px-8 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:border-brand-primary hover:text-brand-primary transition-colors disabled:opacity-50"
+          >
+            {isFetchingMore ? 'Завантаження...' : `Показати ще (${reviewCount - allReviews.length})`}
+          </button>
+        )}
+      </div>
     </section>
   );
 };
