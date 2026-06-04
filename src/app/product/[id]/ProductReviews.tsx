@@ -5,6 +5,7 @@ import type { Review, ReviewsResponse } from '@/lib/api/types';
 import { Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  useGetProductReviewsQuery,
   useLazyGetProductReviewsQuery,
   useCheckProductReviewQuery,
   useCreateReviewMutation,
@@ -154,50 +155,44 @@ export const ProductReviews = ({
   reviewCount: number;
 }) => {
   const [deviceId, setDeviceId] = useState('');
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDeviceId(getOrCreateDeviceId()); // sync localStorage → state after hydration
+  }, []);
   const [submitted, setSubmitted] = useState(false);
-  const [allReviews, setAllReviews] = useState<Review[]>(initialReviews?.data ?? []);
+  const [extraReviews, setExtraReviews] = useState<Review[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  useEffect(() => {
-    setDeviceId(getOrCreateDeviceId());
-  }, []);
-
+  const { data: page1Data, refetch: refetchPage1 } = useGetProductReviewsQuery(
+    { productId, page: 1, limit: LIMIT }
+  );
   const [triggerGetReviews] = useLazyGetProductReviewsQuery();
   const { data: checkData } = useCheckProductReviewQuery(
     { productId, deviceId },
     { skip: !deviceId }
   );
 
+  const allReviews = [...(page1Data?.data ?? initialReviews?.data ?? []), ...extraReviews];
   const hasReviewed = submitted || checkData?.hasReview;
   const hasMore = reviewCount > allReviews.length;
-
-  useEffect(() => {
-    if (allReviews.length === 0 && reviewCount > 0) {
-      triggerGetReviews({ productId, page: 1, limit: LIMIT }).then(result => {
-        if (result.data?.data.length) setAllReviews(result.data.data);
-      });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleShowMore = async () => {
     setIsFetchingMore(true);
     const result = await triggerGetReviews({ productId, page: currentPage + 1, limit: LIMIT });
     if (result.data?.data.length) {
-      setAllReviews(prev => [...prev, ...result.data!.data]);
+      setExtraReviews(prev => [...prev, ...result.data!.data]);
       setCurrentPage(p => p + 1);
     }
     setIsFetchingMore(false);
   };
 
-  const handleSuccess = async () => {
+  const handleSuccess = () => {
     setSubmitted(true);
-    const result = await triggerGetReviews({ productId, page: 1, limit: LIMIT });
-    if (result.data) {
-      setAllReviews(result.data.data);
-      setCurrentPage(1);
-    }
+    setExtraReviews([]);
+    setCurrentPage(1);
+    refetchPage1();
   };
 
   return (
