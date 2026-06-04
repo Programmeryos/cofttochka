@@ -72,6 +72,42 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 name: 'COFTOCHKA.COM',
               },
               url: `https://www.coftochka.com/product/${product.slug ?? id}`,
+              hasMerchantReturnPolicy: {
+                '@type': 'MerchantReturnPolicy',
+                applicableCountry: 'UA',
+                returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+                merchantReturnDays: 14,
+                returnMethod: 'https://schema.org/ReturnByMail',
+                returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+              },
+              shippingDetails: {
+                '@type': 'OfferShippingDetails',
+                shippingLabel: 'За тарифами Нової Пошти',
+                shippingRate: {
+                  '@type': 'MonetaryAmount',
+                  value: '150',
+                  currency: 'UAH',
+                },
+                shippingDestination: {
+                  '@type': 'DefinedRegion',
+                  addressCountry: 'UA',
+                },
+                deliveryTime: {
+                  '@type': 'ShippingDeliveryTime',
+                  handlingTime: {
+                    '@type': 'QuantitativeValue',
+                    minValue: 0,
+                    maxValue: 1,
+                    unitCode: 'DAY',
+                  },
+                  transitTime: {
+                    '@type': 'QuantitativeValue',
+                    minValue: 1,
+                    maxValue: 7,
+                    unitCode: 'DAY',
+                  },
+                },
+              },
             },
           },
           {
