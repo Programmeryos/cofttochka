@@ -35,8 +35,11 @@ export const coftochkaApi = createApi({
     }),
 
     // Reviews
-    getProductReviews: builder.query<ReviewsResponse, string>({
-      query: (productId) => `/products/${productId}/reviews`,
+    getProductReviews: builder.query<ReviewsResponse, { productId: string; page?: number; limit?: number }>({
+      query: ({ productId, page = 1, limit = 5 }) => ({
+        url: `/products/${productId}/reviews`,
+        params: { page, limit },
+      }),
     }),
     checkProductReview: builder.query<CheckReviewResponse, { productId: string; deviceId: string }>({
       query: ({ productId, deviceId }) => ({
@@ -74,6 +77,7 @@ export const {
   useGetProductsQuery,
   useGetProductByIdQuery,
   useGetProductReviewsQuery,
+  useLazyGetProductReviewsQuery,
   useCheckProductReviewQuery,
   useCreateReviewMutation,
   useGetRecentReviewsQuery,

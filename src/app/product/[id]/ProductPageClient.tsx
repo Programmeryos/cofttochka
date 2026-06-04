@@ -10,7 +10,8 @@ import { Footer } from '@/components/sections/Footer';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
 import { useGetProductByIdQuery, useGetProductsQuery } from '@/lib/api';
-import type { Product } from '@/lib/api/types';
+import { ProductReviews } from './ProductReviews';
+import type { Product, ReviewsResponse } from '@/lib/api/types';
 
 const RelatedProductCard = ({ product }: { product: Product }) => {
   const image = product.images[0]?.url;
@@ -37,7 +38,7 @@ const RelatedProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-export const ProductPageClient = ({ id, initialProduct }: { id: string; initialProduct?: Product }) => {
+export const ProductPageClient = ({ id, initialProduct, initialReviews }: { id: string; initialProduct?: Product; initialReviews?: ReviewsResponse }) => {
   const router = useRouter();
   const { data: fetchedProduct, isLoading, isError } = useGetProductByIdQuery(id);
   const product = fetchedProduct ?? initialProduct;
@@ -102,6 +103,13 @@ export const ProductPageClient = ({ id, initialProduct }: { id: string; initialP
               <ProductInfo product={product} />
             </div>
           </div>
+
+          <ProductReviews
+            productId={product.id}
+            initialReviews={initialReviews}
+            avgRating={product.avgRating}
+            reviewCount={product.reviewCount}
+          />
 
           {relatedProducts.length > 0 && (
             <section className="mt-32 mb-16">

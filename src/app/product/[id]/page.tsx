@@ -12,6 +12,16 @@ async function fetchProduct(id: string) {
   }
 }
 
+async function fetchReviews(id: string) {
+  try {
+    const res = await fetch(`${API_BASE}/products/${id}/reviews?page=1&limit=5`, { next: { revalidate: 3600 } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const product = await fetchProduct(id);
@@ -42,8 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = await fetchProduct(id);
-
+  const [product, reviews] = await Promise.all([fetchProduct(id), fetchReviews(id)]);
 
   const jsonLd = product
     ? {
@@ -59,6 +68,27 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               '@type': 'Brand',
               name: 'COFTOCHKA.COM',
             },
+            ...(product.reviewCount > 0 && {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: String(product.avgRating.toFixed(1)),
+                reviewCount: product.reviewCount,
+                bestRating: '5',
+                worstRating: '1',
+              },
+              review: reviews?.data.slice(0, 5).map((r: { rating: number; text: string | null; createdAt: string }) => ({
+                '@type': 'Review',
+                reviewRating: {
+                  '@type': 'Rating',
+                  ratingValue: String(r.rating),
+                  bestRating: '5',
+                  worstRating: '1',
+                },
+                ...(r.text && { reviewBody: r.text }),
+                datePublished: r.createdAt.slice(0, 10),
+                author: { '@type': 'Person', name: 'Покупець' },
+              })),
+            }),
             offers: {
               '@type': 'Offer',
               price: String(product.price),
@@ -130,7 +160,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <ProductPageClient id={id} initialProduct={product ?? undefined} />
+      <ProductPageClient id={id} initialProduct={product ?? undefined} initialReviews={reviews ?? undefined} />
     </>
   );
 }

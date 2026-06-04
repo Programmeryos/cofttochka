@@ -25,6 +25,8 @@ export interface Product {
   categoryId: string | null;
   category: Category | null;
   images: ProductImage[];
+  avgRating: number;
+  reviewCount: number;
   createdAt: string;
   updatedAt: string;
 }
