@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { LOCALES, DEFAULT_LOCALE, hasLocale } from './i18n-config';
+import { DEFAULT_LOCALE, hasLocale } from './i18n-config';
 
 function getPreferredLocale(request: NextRequest): string {
   const acceptLanguage = request.headers.get('accept-language') ?? '';
@@ -12,7 +12,7 @@ function getPreferredLocale(request: NextRequest): string {
   return DEFAULT_LOCALE;
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const pathnameLocale = pathname.split('/')[1];
@@ -37,5 +37,3 @@ export const config = {
     '/((?!_next/static|_next/image|favicon\\.ico|icon\\.svg|icon\\.png|logo\\.svg|logo\\.png|sitemap\\.xml|robots\\.txt).*)',
   ],
 };
-
-export { LOCALES };
