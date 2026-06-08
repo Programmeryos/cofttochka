@@ -6,23 +6,19 @@ import Link from 'next/link';
 import { Search, SlidersHorizontal, X, ShoppingBag, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
+import { useTranslations, useLocale } from '@/context/LocaleContext';
 import type { Product, Category } from '@/lib/api/types';
 
 type SortOption = 'default' | 'price_asc' | 'price_desc';
 
 const ITEMS_PER_PAGE = 6;
 const LOAD_MORE_STEP = 6;
-
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'default', label: 'За замовчуванням' },
-  { value: 'price_asc', label: 'Ціна ↑' },
-  { value: 'price_desc', label: 'Ціна ↓' },
-];
-
 const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
 export const ProductCard = ({ product }: { product: Product }) => {
   const { addItem } = useCart();
+  const t = useTranslations();
+  const locale = useLocale();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -42,7 +38,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
       className="group relative"
     >
       <div className="aspect-4/5 bg-brand-light relative overflow-hidden rounded-2xl">
-        <Link href={`/product/${product.slug ?? product.id}`} className="block w-full h-full">
+        <Link href={`/${locale}/product/${product.slug ?? product.id}`} className="block w-full h-full">
           {imageUrl ? (
             <Image
               src={imageUrl}
@@ -61,7 +57,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
         {!product.inStock && (
           <div className="absolute top-4 left-4 z-10">
             <span className="bg-neutral-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">
-              Немає в наявності
+              {t.catalog.outOfStock}
             </span>
           </div>
         )}
@@ -73,13 +69,13 @@ export const ProductCard = ({ product }: { product: Product }) => {
             className="w-full bg-white text-brand-dark py-3 rounded-xl font-medium shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex items-center justify-center gap-2 active:scale-95 pointer-events-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ShoppingBag size={18} />
-            До кошика
+            {t.catalog.addToCart}
           </button>
         </div>
       </div>
 
       <div className="mt-4 px-1">
-        <Link href={`/product/${product.slug ?? product.id}`}>
+        <Link href={`/${locale}/product/${product.slug ?? product.id}`}>
           <h3 className="font-serif text-lg font-bold group-hover:text-brand-primary transition-colors">
             {product.name}
           </h3>
@@ -104,6 +100,7 @@ interface CatalogProps {
 }
 
 export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
+  const t = useTranslations();
   const [search, setSearch] = useState('');
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | undefined>(undefined);
   const [inStock, setInStock] = useState(false);
@@ -112,19 +109,23 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
   const [showFilters, setShowFilters] = useState(false);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
+  const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+    { value: 'default', label: t.catalog.sort.default },
+    { value: 'price_asc', label: t.catalog.sort.priceAsc },
+    { value: 'price_desc', label: t.catalog.sort.priceDesc },
+  ];
+
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
   }, [selectedCategoryId, search, inStock, selectedSizes, sortBy]);
 
   const toggleSize = (size: string) =>
-    setSelectedSizes(prev =>
-      prev.includes(size) ? prev.filter(s => s !== size) : [...prev, size]
+    setSelectedSizes((prev) =>
+      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
     );
 
   const activeFilterCount =
-    selectedSizes.length +
-    (inStock ? 1 : 0) +
-    (sortBy !== 'default' ? 1 : 0);
+    selectedSizes.length + (inStock ? 1 : 0) + (sortBy !== 'default' ? 1 : 0);
 
   const resetFilters = () => {
     setSelectedSizes([]);
@@ -137,25 +138,21 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
 
   const filteredProducts = useMemo(() => {
     let result = initialProducts;
-
-    if (selectedCategoryId) {
-      result = result.filter(p => p.categoryId === selectedCategoryId);
-    }
+    if (selectedCategoryId) result = result.filter((p) => p.categoryId === selectedCategoryId);
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      result = result.filter(p => p.name.toLowerCase().includes(q));
+      result = result.filter((p) => p.name.toLowerCase().includes(q));
     }
-    if (inStock) {
-      result = result.filter(p => p.inStock);
-    }
-    if (selectedSizes.length > 0) {
-      result = result.filter(p => p.size && selectedSizes.includes(p.size));
-    }
-
+    if (inStock) result = result.filter((p) => p.inStock);
+    if (selectedSizes.length > 0)
+      result = result.filter((p) => p.size && selectedSizes.includes(p.size));
     switch (sortBy) {
-      case 'price_asc':  return [...result].sort((a, b) => Number(a.price) - Number(b.price));
-      case 'price_desc': return [...result].sort((a, b) => Number(b.price) - Number(a.price));
-      default:           return result;
+      case 'price_asc':
+        return [...result].sort((a, b) => Number(a.price) - Number(b.price));
+      case 'price_desc':
+        return [...result].sort((a, b) => Number(b.price) - Number(a.price));
+      default:
+        return result;
     }
   }, [initialProducts, selectedCategoryId, search, inStock, selectedSizes, sortBy]);
 
@@ -163,7 +160,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
   const hasMore = visibleCount < filteredProducts.length;
 
   const loadMore = useCallback(() => {
-    setVisibleCount(prev => prev + LOAD_MORE_STEP);
+    setVisibleCount((prev) => prev + LOAD_MORE_STEP);
   }, []);
 
   return (
@@ -171,17 +168,19 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-6">
           <div>
-            <h2 className="text-4xl font-serif font-bold mb-4">Наша Колекція</h2>
+            <h2 className="text-4xl font-serif font-bold mb-4">{t.catalog.title}</h2>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setSelectedCategoryId(undefined)}
                 className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                  !selectedCategoryId ? 'bg-brand-dark text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  !selectedCategoryId
+                    ? 'bg-brand-dark text-white'
+                    : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                 }`}
               >
-                Всі
+                {t.catalog.all}
               </button>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategoryId(cat.id)}
@@ -199,18 +198,21 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
 
           <div className="flex items-center gap-3 w-full md:w-auto">
             <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400"
+                size={18}
+              />
               <input
                 type="text"
-                placeholder="Пошук за назвою..."
+                placeholder={t.catalog.searchPlaceholder}
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-neutral-50 rounded-2xl border border-transparent focus:border-brand-primary focus:bg-white outline-none transition-all"
               />
             </div>
             <button
-              onClick={() => setShowFilters(prev => !prev)}
-              aria-label="Фільтри"
+              onClick={() => setShowFilters((prev) => !prev)}
+              aria-label={t.catalog.filtersAriaLabel}
               className={`relative p-3 rounded-2xl transition-colors ${
                 showFilters ? 'bg-brand-dark text-white' : 'bg-neutral-50 hover:bg-neutral-100'
               }`}
@@ -228,7 +230,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
                 className="flex items-center gap-1.5 px-4 py-3 text-sm text-neutral-500 hover:text-brand-dark bg-neutral-50 rounded-2xl hover:bg-neutral-100 transition-colors whitespace-nowrap"
               >
                 <X size={14} />
-                Скинути
+                {t.catalog.reset}
               </button>
             )}
           </div>
@@ -245,9 +247,11 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
             >
               <div className="py-6 mb-6 border-t border-b border-neutral-100 grid grid-cols-1 sm:grid-cols-3 gap-8">
                 <div>
-                  <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">Розмір</h4>
+                  <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">
+                    {t.catalog.sizeLabel}
+                  </h4>
                   <div className="flex flex-wrap gap-2">
-                    {ALL_SIZES.map(size => (
+                    {ALL_SIZES.map((size) => (
                       <button
                         key={size}
                         onClick={() => toggleSize(size)}
@@ -264,26 +268,34 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">Наявність</h4>
+                  <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">
+                    {t.catalog.availabilityLabel}
+                  </h4>
                   <button
-                    onClick={() => setInStock(prev => !prev)}
+                    onClick={() => setInStock((prev) => !prev)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
                       inStock
                         ? 'border-brand-primary bg-brand-primary/10 text-brand-primary'
                         : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
                     }`}
                   >
-                    <span className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${inStock ? 'bg-brand-primary border-brand-primary' : 'border-neutral-300'}`}>
+                    <span
+                      className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                        inStock ? 'bg-brand-primary border-brand-primary' : 'border-neutral-300'
+                      }`}
+                    >
                       {inStock && <Check size={11} strokeWidth={3} className="text-white" />}
                     </span>
-                    Тільки в наявності
+                    {t.catalog.inStockOnly}
                   </button>
                 </div>
 
                 <div>
-                  <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">Сортування</h4>
+                  <h4 className="text-xs font-bold mb-3 uppercase tracking-widest text-neutral-400">
+                    {t.catalog.sortLabel}
+                  </h4>
                   <div className="flex flex-col gap-1">
-                    {SORT_OPTIONS.map(opt => (
+                    {SORT_OPTIONS.map((opt) => (
                       <button
                         key={opt.value}
                         onClick={() => setSortBy(opt.value)}
@@ -304,24 +316,25 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
         </AnimatePresence>
 
         <p className="text-sm text-neutral-500 mb-8">
-          Знайдено: <span className="font-semibold text-brand-dark">{filteredProducts.length}</span> товарів
+          {t.catalog.found}{' '}
+          <span className="font-semibold text-brand-dark">{filteredProducts.length}</span>
         </p>
 
         {filteredProducts.length === 0 ? (
           <div className="py-24 text-center">
-            <p className="text-neutral-400 font-serif italic text-xl">Нічого не знайдено...</p>
+            <p className="text-neutral-400 font-serif italic text-xl">{t.catalog.noResults}</p>
             <button
               onClick={resetFilters}
               className="mt-6 px-6 py-2.5 bg-brand-dark text-white rounded-full text-sm hover:bg-brand-secondary transition-colors"
             >
-              Скинути всі фільтри
+              {t.catalog.resetFilters}
             </button>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               <AnimatePresence mode="popLayout">
-                {visibleProducts.map(product => (
+                {visibleProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </AnimatePresence>
@@ -333,7 +346,7 @@ export const Catalog = ({ initialProducts, categories }: CatalogProps) => {
                   onClick={loadMore}
                   className="px-10 py-4 border-2 border-brand-dark text-brand-dark rounded-full font-medium hover:bg-brand-dark hover:text-white transition-all active:scale-95"
                 >
-                  Показати ще ({filteredProducts.length - visibleCount})
+                  {t.catalog.showMore} ({filteredProducts.length - visibleCount})
                 </button>
               </div>
             )}

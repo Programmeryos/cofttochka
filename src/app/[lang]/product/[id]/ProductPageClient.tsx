@@ -10,13 +10,15 @@ import { Footer } from '@/components/sections/Footer';
 import { ProductGallery } from './ProductGallery';
 import { ProductInfo } from './ProductInfo';
 import { useGetProductByIdQuery, useGetProductsQuery } from '@/lib/api';
+import { useTranslations, useLocale } from '@/context/LocaleContext';
 import { ProductReviews } from './ProductReviews';
 import type { Product, ReviewsResponse } from '@/lib/api/types';
 
 const RelatedProductCard = ({ product }: { product: Product }) => {
+  const locale = useLocale();
   const image = product.images[0]?.url;
   return (
-    <Link href={`/product/${product.slug ?? product.id}`} className="group block">
+    <Link href={`/${locale}/product/${product.slug ?? product.id}`} className="group block">
       <div className="aspect-4/5 bg-brand-light rounded-2xl overflow-hidden relative mb-4">
         {image ? (
           <Image
@@ -38,20 +40,32 @@ const RelatedProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-export const ProductPageClient = ({ id, initialProduct, initialReviews }: { id: string; initialProduct?: Product; initialReviews?: ReviewsResponse }) => {
+export const ProductPageClient = ({
+  id,
+  lang,
+  initialProduct,
+  initialReviews,
+}: {
+  id: string;
+  lang: string;
+  initialProduct?: Product;
+  initialReviews?: ReviewsResponse;
+}) => {
   const router = useRouter();
+  const t = useTranslations();
+  const locale = useLocale();
   const { data: fetchedProduct, isLoading, isError } = useGetProductByIdQuery(id);
   const product = fetchedProduct ?? initialProduct;
   const { data: relatedData } = useGetProductsQuery(
     { categoryId: product?.categoryId ?? undefined, limit: 5 },
-    { skip: !product?.categoryId }
+    { skip: !product?.categoryId },
   );
 
-  const relatedProducts = relatedData?.data.filter(p => p.id !== id).slice(0, 4) ?? [];
+  const relatedProducts = relatedData?.data.filter((p) => p.id !== id).slice(0, 4) ?? [];
 
   useEffect(() => {
-    if (isError) router.replace('/not-found');
-  }, [isError, router]);
+    if (isError) router.replace(`/${lang}/not-found`);
+  }, [isError, router, lang]);
 
   if (isLoading && !initialProduct) {
     return (
@@ -71,7 +85,7 @@ export const ProductPageClient = ({ id, initialProduct, initialReviews }: { id: 
             </div>
           </div>
         </main>
-        <Footer />
+        <Footer dict={t.footer} lang={locale} />
       </>
     );
   }
@@ -87,10 +101,25 @@ export const ProductPageClient = ({ id, initialProduct, initialReviews }: { id: 
         <div className="container mx-auto px-4 py-8">
           <nav aria-label="breadcrumb" className="mb-8">
             <ol className="flex items-center gap-2 text-sm text-neutral-400">
-              <li><Link href="/" className="hover:text-brand-dark transition-colors">Головна</Link></li>
-              <li><ChevronRight size={14} /></li>
-              <li><Link href="/#catalog" className="hover:text-brand-dark transition-colors">Каталог</Link></li>
-              <li><ChevronRight size={14} /></li>
+              <li>
+                <Link href={`/${locale}`} className="hover:text-brand-dark transition-colors">
+                  {t.product.home}
+                </Link>
+              </li>
+              <li>
+                <ChevronRight size={14} />
+              </li>
+              <li>
+                <Link
+                  href={`/${locale}/#catalog`}
+                  className="hover:text-brand-dark transition-colors"
+                >
+                  {t.product.catalogBreadcrumb}
+                </Link>
+              </li>
+              <li>
+                <ChevronRight size={14} />
+              </li>
               <li className="text-brand-dark font-medium truncate">{product.name}</li>
             </ol>
           </nav>
@@ -113,9 +142,9 @@ export const ProductPageClient = ({ id, initialProduct, initialReviews }: { id: 
 
           {relatedProducts.length > 0 && (
             <section className="mt-32 mb-16">
-              <h2 className="text-3xl font-serif font-bold mb-12">Вам також може сподобатись</h2>
+              <h2 className="text-3xl font-serif font-bold mb-12">{t.product.relatedTitle}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {relatedProducts.map(p => (
+                {relatedProducts.map((p) => (
                   <RelatedProductCard key={p.id} product={p} />
                 ))}
               </div>
@@ -123,7 +152,7 @@ export const ProductPageClient = ({ id, initialProduct, initialReviews }: { id: 
           )}
         </div>
       </main>
-      <Footer />
+      <Footer dict={t.footer} lang={locale} />
     </>
   );
 };

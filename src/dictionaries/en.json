@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "title": "COFTOCHKA.COM — Handmade Knitwear Delivered Across Ukraine",
+    "description": "Discover coziness with COFTOCHKA.COM. Handmade knitted clothing that wraps you in warmth. Sweaters, cardigans, oversized styles. Quality, style, and handmade love from Ukraine.",
+    "ogTitle": "COFTOCHKA.COM — Handmade Knitwear",
+    "ogDescription": "Cozy handmade knitwear. Sweaters, cardigans, oversized styles. Made in Ukraine."
+  },
+  "header": {
+    "catalog": "Catalog",
+    "about": "About",
+    "contacts": "Contacts",
+    "cartAriaLabel": "Open cart"
+  },
+  "langSwitcher": {
+    "uk": "УКР",
+    "en": "ENG"
+  },
+  "hero": {
+    "title": "Knitted clothing,",
+    "titleHighlight": "that hugs you",
+    "description": "Handmade with soul. Natural yarn, modern cut and warmth in every stitch for your perfect look.",
+    "cta": "View collection",
+    "imageAlt": "Woman in knitwear — COFTOCHKA.COM"
+  },
+  "catalog": {
+    "title": "Our Collection",
+    "all": "All",
+    "searchPlaceholder": "Search by name...",
+    "filtersAriaLabel": "Filters",
+    "reset": "Reset",
+    "sizeLabel": "Size",
+    "availabilityLabel": "Availability",
+    "sortLabel": "Sort",
+    "inStockOnly": "In stock only",
+    "found": "Found:",
+    "addToCart": "Add to cart",
+    "outOfStock": "Out of stock",
+    "noResults": "Nothing found...",
+    "resetFilters": "Reset all filters",
+    "showMore": "Show more",
+    "sort": {
+      "default": "Default",
+      "priceAsc": "Price ↑",
+      "priceDesc": "Price ↓"
+    }
+  },
+  "about": {
+    "title": "Made with love for every detail",
+    "description": "COFTOCHKA.COM is not just a clothing brand — it's a philosophy of coziness. Every item is handcrafted by artisans who pour a piece of their soul into every stitch. We use only high-quality natural yarn so you can feel warmth and softness every day.",
+    "imageAlt": "Artisan knitting — handmade COFTOCHKA.COM",
+    "features": {
+      "handmade": {
+        "title": "Handmade",
+        "text": "Every item is unique and crafted by hand."
+      },
+      "quality": {
+        "title": "Quality",
+        "text": "We use only premium Italian and Turkish yarn."
+      },
+      "madeInUkraine": {
+        "title": "Made in Ukraine",
+        "text": "We are proud of our Ukrainian roots."
+      }
+    }
+  },
+  "footer": {
+    "description": "Your perfect coziness in every stitch. Handmade knitwear with delivery across Ukraine.",
+    "navigation": "Navigation",
+    "navCatalog": "Catalog",
+    "navAbout": "About",
+    "navContacts": "Contacts",
+    "contactUs": "Contact Us",
+    "instagramAriaLabel": "Instagram COFTOCHKA",
+    "phoneAriaLabel": "Call us",
+    "address": "Kyiv, Ukraine",
+    "rights": "© 2026 COFTOCHKA.COM. All rights reserved.",
+    "privacyLink": "Privacy Policy",
+    "termsLink": "Terms of Use"
+  },
+  "cart": {
+    "title": "Cart",
+    "checkoutTitle": "Checkout",
+    "successTitle": "Thank you!",
+    "ariaLabel": "Cart",
+    "emptyTitle": "Cart is empty",
+    "emptySubtext": "Add something warm",
+    "goToCatalog": "Go to catalog",
+    "total": "Total:",
+    "placeOrder": "Place order",
+    "continueShopping": "Continue shopping",
+    "size": "Size:",
+    "orderSummaryLabel": "Your order ({count} items)",
+    "orderTotal": "Total",
+    "fields": {
+      "name": "Name *",
+      "phone": "Phone *",
+      "email": "Email",
+      "comment": "Comment"
+    },
+    "placeholders": {
+      "name": "John Smith",
+      "phone": "+380501234567",
+      "email": "john@example.com",
+      "comment": "Order notes..."
+    },
+    "validation": {
+      "nameRequired": "Please enter your name",
+      "nameTooShort": "Minimum 2 characters",
+      "nameInvalid": "Letters and spaces only",
+      "phoneRequired": "Please enter your phone number",
+      "phoneInvalid": "Format: +380XXXXXXXXX or 0XXXXXXXXX",
+      "emailInvalid": "Please enter a valid email"
+    },
+    "agreeText": "By confirming the order, you agree to the",
+    "termsLink": "terms of use",
+    "and": "and",
+    "privacyLink": "privacy policy",
+    "submitting": "Submitting...",
+    "confirmOrder": "Confirm order",
+    "orderError": "Error placing order. Please try again.",
+    "successMessage": "Thank you for your purchase. We will contact you shortly to confirm your order.",
+    "close": "Close"
+  },
+  "product": {
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "size": "Size",
+    "category": "Category",
+    "addToCart": "Add to cart",
+    "delivery": "Delivery across all of Ukraine",
+    "returns": "Exchange & returns within 14 days",
+    "descriptionAccordion": "Description",
+    "deliveryAccordion": "Delivery & Payment",
+    "deliveryText": "Nova Poshta (branch, parcel locker, courier), Ukrposhta.",
+    "paymentText": "Cash on delivery or online card payment.",
+    "deliveryLabel": "Delivery:",
+    "paymentLabel": "Payment:",
+    "home": "Home",
+    "catalogBreadcrumb": "Catalog",
+    "relatedTitle": "You might also like",
+    "photoAlt": "photo",
+    "thumbnailAlt": "thumbnail"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "leaveReview": "Leave a review",
+    "ratingLabel": "Rating *",
+    "commentLabel": "Comment (optional)",
+    "commentPlaceholder": "Share your impressions...",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "alreadyReviewed": "You have already left a review. Thank you!",
+    "noReviews": "No reviews yet. Be the first!",
+    "showMore": "Show more",
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again.",
+    "review": "review",
+    "reviewsFew": "reviews",
+    "reviewsMany": "reviews"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "subtitle": "It seems this thread has broken. Let's go back to the collection.",
+    "cta": "To catalog"
+  },
+  "terms": {
+    "pageTitle": "Terms of Use | COFTOCHKA.COM",
+    "pageDescription": "Terms and conditions of use for the COFTOCHKA.COM online store. Order, payment, delivery and return procedures.",
+    "title": "Public Offer and Terms of Use",
+    "lastUpdated": "Last revised: June 2, 2025",
+    "lastUpdatedDate": "Date of last update: June 2, 2025."
+  },
+  "privacy": {
+    "pageTitle": "Privacy Policy | COFTOCHKA.COM",
+    "pageDescription": "Learn how COFTOCHKA.COM collects, stores and protects your personal data in accordance with Ukrainian law.",
+    "title": "Privacy Policy",
+    "lastUpdated": "Last revised: June 2, 2025",
+    "lastUpdatedDate": "Date of last update: June 2, 2025."
+  }
+}
